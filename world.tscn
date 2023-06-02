@@ -1,0 +1,41 @@
+[gd_scene load_steps=7 format=3 uid="uid://cr2mhoqo7014t"]
+
+[ext_resource type="Script" path="res://World.gd" id="1_wrylp"]
+[ext_resource type="PackedScene" uid="uid://daono88iy1yu0" path="res://camera.tscn" id="2_rj17n"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wa6ud"]
+vertex_color_use_as_albedo = true
+roughness = 0.52
+refraction_enabled = true
+
+[sub_resource type="BoxMesh" id="BoxMesh_pqadg"]
+material = SubResource("StandardMaterial3D_wa6ud")
+size = Vector3(1, 255, 1)
+
+[sub_resource type="MultiMesh" id="MultiMesh_qhfea"]
+transform_format = 1
+use_colors = true
+mesh = SubResource("BoxMesh_pqadg")
+
+[sub_resource type="Environment" id="Environment_gpl8t"]
+
+[node name="World" type="Node3D"]
+script = ExtResource("1_wrylp")
+
+[node name="Terrain" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
+texture_filter = 0
+
+[node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -255, 0)
+visible = false
+multimesh = SubResource("MultiMesh_qhfea")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_gpl8t")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.409326, 0.631342, -0.65868, -0.850898, -0.00360838, 0.525318, 0.329279, 0.775496, 0.538685, 0, 280.248, 0)
+
+[node name="Camera" parent="." instance=ExtResource("2_rj17n")]
+transform = Transform3D(0.520564, 0.341955, -0.782356, -0.00027217, 0.916364, 0.400346, 0.853823, -0.208193, 0.477119, -149.957, 54.3481, 104.657)
