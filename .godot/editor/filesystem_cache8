@@ -1,0 +1,12 @@
+2a60927148abd1d33b818b535e306557
+::res://::1686079062
+Camera3D.gd::GDScript::-1::1686026765::0::1::::<>Node3D<>::
+camera.tscn::PackedScene::7188979446302478897::1686026765::0::1::::<><>::res://Camera3D.gd
+icon.svg::CompressedTexture2D::6287288272549838721::1685744854::1686027568::1::::<><>::
+map.gd::GDScript::-1::1686026765::0::1::::_map<>Node<>::
+minimap_collision.gd::GDScript::-1::1686026765::0::1::::<>Area2D<>::
+README.md::TextFile::-1::1685744854::0::1::::<><>::
+utils.gd::GDScript::-1::1685744854::0::1::::utils<>Node<>::
+World.gd::GDScript::-1::1686040416::0::1::::<>Node3D<>::
+world.tscn::PackedScene::6022531773786543453::1686040428::0::1::::<><>::res://World.gd<>uid://daono88iy1yu0<>res://minimap_collision.gd
+zero.png::CompressedTexture2D::300902093379571181::1686027521::1686027568::1::::<><>::
