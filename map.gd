@@ -11,6 +11,7 @@ enum terrain_types {
 	desert,
 	moutains,
 	river,
+	shore,
 	ocean,
 }
 

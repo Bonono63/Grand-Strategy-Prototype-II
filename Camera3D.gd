@@ -1,7 +1,7 @@
 extends Node3D
 
-const zoom_increment = 5
-const max_zoom = 100
+const zoom_increment = 20
+const max_zoom = 1000
 const min_zoom = 10
 const default_zoom = 50
 
@@ -43,9 +43,9 @@ func _unhandled_input(event):
 			if event.is_action_released("middle_click"):
 				position_control = false
 			if event.is_action_pressed("right_click"):
-				rotation_control = true
+				position_control = true
 			if event.is_action_released("right_click"):
-				rotation_control = false
+				position_control = false
 	if event is InputEventKey:
 		if event.is_action_pressed("w"):
 			forward = true

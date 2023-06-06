@@ -1,8 +1,12 @@
-[gd_scene load_steps=9 format=3 uid="uid://cr2mhoqo7014t"]
+[gd_scene load_steps=11 format=3 uid="uid://cr2mhoqo7014t"]
 
 [ext_resource type="Script" path="res://World.gd" id="1_wrylp"]
+[ext_resource type="Script" path="res://World Collision.gd" id="2_3dlbw"]
 [ext_resource type="PackedScene" uid="uid://daono88iy1yu0" path="res://camera.tscn" id="2_rj17n"]
 [ext_resource type="Script" path="res://minimap_collision.gd" id="4_pjcvx"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_50lk0"]
+size = Vector3(1, 0, 1)
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_2v4oq"]
 sky_top_color = Color(0.32549, 0.619608, 0.823529, 1)
@@ -34,6 +38,14 @@ centered = false
 pixel_size = 1.0
 texture_filter = 0
 
+[node name="World Collision" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
+script = ExtResource("2_3dlbw")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World Collision"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0.1)
+shape = SubResource("BoxShape3D_50lk0")
+
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_gpl8t")
 
@@ -47,6 +59,7 @@ World = NodePath("..")
 [node name="GUI" type="CanvasLayer" parent="."]
 
 [node name="Minimap" type="ColorRect" parent="GUI"]
+visible = false
 offset_right = 40.0
 offset_bottom = 40.0
 mouse_filter = 2
@@ -94,3 +107,25 @@ offset_right = 10.0
 offset_bottom = 10.0
 mouse_filter = 2
 color = Color(1, 0.203922, 1, 1)
+
+[node name="location Inspector" type="Panel" parent="GUI"]
+visible = false
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -40.0
+offset_right = 40.0
+grow_vertical = 0
+mouse_filter = 1
+
+[node name="coords" type="Label" parent="GUI/location Inspector"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "coords"
+
+[node name="info" type="Label" parent="GUI/location Inspector"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info v"
