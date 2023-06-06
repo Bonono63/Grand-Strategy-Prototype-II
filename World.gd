@@ -13,6 +13,7 @@ var minimap_size : Vector2 #= Vector2(map.length+4, map.width+4)
 func _init():
 	seed = randi()
 	
+	var speed : float
 	var attack : float = 100
 	var defense : float = 50
 	var equipment : float = 5000
@@ -21,7 +22,7 @@ func _init():
 	var actual_strength : float = max_strength 
 	var morale : float
 	var defense_mod : float
-	var unit : Array = [attack, defense, morale, max_strength, actual_strength, defense_mod] #simple mock division with all necessary stats
+	var unit : Array = [attack, defense, speed, max_strength, actual_strength, morale, equipment, manpower, defense_mod] #simple mock division with all necessary stats
 	unitFightingEqual(unit)	
    
 func unitFightingEqual(unit : Array): #simulates combat between 2 units with the same stats
