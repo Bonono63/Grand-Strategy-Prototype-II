@@ -12,6 +12,32 @@ var minimap_size : Vector2 #= Vector2(map.length+4, map.width+4)
 
 func _init():
 	seed = randi()
+	
+	var attack : float = 100
+	var defense : float = 50
+	var equipment : float = 5000
+	var manpower : float = 5000
+	var max_strength : float = (equipment + manpower) / 2
+	var actual_strength : float = max_strength 
+	var morale : float
+	var defense_mod : float
+	var unit : Array = [attack, defense, morale, max_strength, actual_strength, defense_mod] #simple mock division with all necessary stats
+	unitFightingEqual(unit)	
+   
+func unitFightingEqual(unit : Array): #simulates combat between 2 units with the same stats
+	var combat_cycles : int
+	
+	unit[2] = unit[4] / unit[3] #morale is equal to the ratio of actual_strength and max_strength
+	
+	while(unit[2] >= .85): #when a unit loses more than 15% morale it retreats (designed for medieval combat)
+		var damage : float = unit [0] - unit [1] #damage = enemy attack - unit defense
+		unit[4] = unit[4] - damage #new unit strength after damage is applied
+		unit[2] = unit[4] / unit[3]
+		combat_cycles+=1
+		print(unit[2], " morale")
+	
+	print(combat_cycles , " combat cycles")
+	print(unit[4], " unit's remaining strength")
 
 func _ready():
 	$GUI/Minimap/Area2D.connect("collision", minimap_collision)
