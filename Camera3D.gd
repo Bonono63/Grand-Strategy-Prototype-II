@@ -1,14 +1,17 @@
 extends Node3D
 
-const zoom_increment = 2
-const max_zoom = 300
-const min_zoom = -100
+const zoom_increment = 5
+const max_zoom = 100
+const min_zoom = 10
+const default_zoom = 50
+
+const rotation_control_enabled = false
 
 @export var zoom_speed = 0.09
-@export var mouse_sensitivity = 0.005
-#@export var main : Node3D
+@export var mouse_sensitivity = 0.05
+@export var World : Node3D
 
-var zoom = min_zoom
+var zoom = default_zoom
 
 var x = 0 
 var y = 0
@@ -73,9 +76,9 @@ var old_rotation : Vector3
 
 func _process(_delta):
 	if position_control:
-		translate_object_local(Vector3(x*mouse_sensitivity,y*mouse_sensitivity,0))
+		translate_object_local(Vector3(x*mouse_sensitivity*(position.y/45),y*mouse_sensitivity*(position.y/45),0))
 	
-	if rotation_control && shift > 1:
+	if rotation_control && shift > 1 && rotation_control_enabled:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		_rotation_y = (x*mouse_sensitivity)
 		rotate_y(_rotation_y)
@@ -83,16 +86,20 @@ func _process(_delta):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	
 	if (forward):
-		translate_object_local(Vector3(0, keyboard_sensitivity*shift, 0))
+		translate_object_local(Vector3(0, keyboard_sensitivity*shift*(position.y/45), 0))
 	if (backward):
-		translate_object_local(Vector3(0, -keyboard_sensitivity*shift, 0))
+		translate_object_local(Vector3(0, -keyboard_sensitivity*shift*(position.y/45), 0))
 	if (left):
-		translate_object_local(Vector3(-keyboard_sensitivity*shift, 0, 0))
+		translate_object_local(Vector3(-keyboard_sensitivity*shift*(position.y/45), 0, 0))
 	if (right):
-		translate_object_local(Vector3(keyboard_sensitivity*shift, 0, 0))
+		translate_object_local(Vector3(keyboard_sensitivity*shift*(position.y/45), 0, 0))
 	
 	position.y = zoom
 	position.y = clamp(position.y, min_zoom, max_zoom)
+	
+	#position.x = clamp(position.x, 0,)
+	position.x = clamp(position.x, 0, World.map.length)
+	position.z = clamp(position.z, -World.map.width, 0)
 	
 	x = 0
 	y = 0

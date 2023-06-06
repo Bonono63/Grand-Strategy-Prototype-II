@@ -1,41 +1,96 @@
-[gd_scene load_steps=7 format=3 uid="uid://cr2mhoqo7014t"]
+[gd_scene load_steps=9 format=3 uid="uid://cr2mhoqo7014t"]
 
 [ext_resource type="Script" path="res://World.gd" id="1_wrylp"]
 [ext_resource type="PackedScene" uid="uid://daono88iy1yu0" path="res://camera.tscn" id="2_rj17n"]
+[ext_resource type="Script" path="res://minimap_collision.gd" id="4_pjcvx"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wa6ud"]
-vertex_color_use_as_albedo = true
-roughness = 0.52
-refraction_enabled = true
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_2v4oq"]
+sky_top_color = Color(0.32549, 0.619608, 0.823529, 1)
+sky_curve = 0.0401915
+ground_bottom_color = Color(0.109804, 0.0901961, 0.0666667, 1)
+ground_horizon_color = Color(0.392157, 0.4, 0.415686, 1)
+ground_curve = 0.011892
 
-[sub_resource type="BoxMesh" id="BoxMesh_pqadg"]
-material = SubResource("StandardMaterial3D_wa6ud")
-size = Vector3(1, 255, 1)
-
-[sub_resource type="MultiMesh" id="MultiMesh_qhfea"]
-transform_format = 1
-use_colors = true
-mesh = SubResource("BoxMesh_pqadg")
+[sub_resource type="Sky" id="Sky_73237"]
+sky_material = SubResource("ProceduralSkyMaterial_2v4oq")
 
 [sub_resource type="Environment" id="Environment_gpl8t"]
+background_mode = 2
+sky = SubResource("Sky_73237")
+tonemap_mode = 3
+ssao_enabled = true
+sdfgi_enabled = true
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_2vory"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_nrk3u"]
 
 [node name="World" type="Node3D"]
 script = ExtResource("1_wrylp")
 
 [node name="Terrain" type="Sprite3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
+centered = false
+pixel_size = 1.0
 texture_filter = 0
-
-[node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -255, 0)
-visible = false
-multimesh = SubResource("MultiMesh_qhfea")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_gpl8t")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.409326, 0.631342, -0.65868, -0.850898, -0.00360838, 0.525318, 0.329279, 0.775496, 0.538685, 0, 280.248, 0)
+transform = Transform3D(-0.409326, 0.631342, -0.65868, -0.850898, -0.00360818, 0.525318, 0.329279, 0.775496, 0.538685, 0, 94.8562, 0)
 
-[node name="Camera" parent="." instance=ExtResource("2_rj17n")]
-transform = Transform3D(0.520564, 0.341955, -0.782356, -0.00027217, 0.916364, 0.400346, 0.853823, -0.208193, 0.477119, -149.957, 54.3481, 104.657)
+[node name="Camera" parent="." node_paths=PackedStringArray("World") instance=ExtResource("2_rj17n")]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
+World = NodePath("..")
+
+[node name="GUI" type="CanvasLayer" parent="."]
+
+[node name="Minimap" type="ColorRect" parent="GUI"]
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+mouse_force_pass_scroll_events = false
+color = Color(0.136826, 0.136826, 0.136826, 1)
+
+[node name="TextureRect" type="TextureRect" parent="GUI/Minimap"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="camera_outline" type="ColorRect" parent="GUI/Minimap"]
+material = SubResource("CanvasItemMaterial_2vory")
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+color = Color(0.933333, 0.933333, 0.933333, 0.627451)
+
+[node name="Area2D" type="Area2D" parent="GUI/Minimap"]
+collision_layer = 3
+collision_mask = 3
+priority = 1.0
+script = ExtResource("4_pjcvx")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GUI/Minimap/Area2D"]
+shape = SubResource("RectangleShape2D_nrk3u")
+
+[node name="ColorRect" type="ColorRect" parent="GUI/Minimap/Area2D/CollisionShape2D"]
+visible = false
+visibility_layer = 3
+offset_left = -10.0
+offset_top = -10.0
+offset_right = 10.0
+offset_bottom = 10.0
+mouse_filter = 2
+color = Color(1, 0.203922, 1, 1)

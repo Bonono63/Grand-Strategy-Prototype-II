@@ -1,10 +1,27 @@
 class_name _map
 extends Node
 
-const MAX_HEIGHT = 256
+const MAX_VALUE = 256
 var length
 var width
 
-var topography : Array
-var biome : Array
+enum terrain_types {
+	plains,
+	forest,
+	desert,
+	moutains,
+	river,
+	ocean,
+}
+
+enum building_types {
+	empty,
+	city,
+	fort,
+	moat,
+}
+
+var terrain : Array
+var building : Array
+# represents the control of each country
 var territory : Array
