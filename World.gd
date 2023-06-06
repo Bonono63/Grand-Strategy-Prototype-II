@@ -15,7 +15,7 @@ func _init():
 
 func _ready():
 	$GUI/Minimap/Area2D.connect("collision", minimap_collision)
-	open("user://zero.png")
+	open("res://zero.png")
 	generate_terrain_map()
 	update_terrain_map()
 	#save("user://save__01.png")
