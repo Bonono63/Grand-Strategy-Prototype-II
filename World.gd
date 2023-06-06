@@ -37,7 +37,7 @@ func unitFightingEqual(unit : Array): #simulates combat between 2 units with the
 		print(unit[2], " morale")
 	
 	print(combat_cycles , " combat cycles")
-	print(unit[4], " unit's remaining strength")
+	print(unit[4], " unit's remaining strength") 
 
 func _ready():
 	$GUI/Minimap/Area2D.connect("collision", minimap_collision)
