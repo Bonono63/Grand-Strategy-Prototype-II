@@ -24,7 +24,10 @@ func _init():
 	var morale : float
 	var defense_mod : float
 	var unit : Array = [attack, defense, speed, max_strength, actual_strength, morale, equipment, manpower, defense_mod] #simple mock division with all necessary stats
-	unitFightingEqual(unit)	
+	unitFightingEqual(unit)
+	var unitA = [100, 50, 10, 1, 1, 1, 5000, 5000, null]
+	var unitB = [50, 25, 20, 1, 1, 1, 2500, 2500, null]
+	#division.combat(unitA, unitB)
    
 func unitFightingEqual(unit : Array): #simulates combat between 2 units with the same stats
 	var combat_cycles : int

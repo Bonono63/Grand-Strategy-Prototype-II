@@ -12,13 +12,10 @@ var defense_mod: float #based on terrain
 
 var unit : Array = [attack, defense, speed, max_strength, actual_strength, morale, supply, manpower, defense_mod]
 
-var unitA = [100, 50, 10, 1, 1, 1, 5000, 5000, null]
-var unitB = [50, 25, 20, 1, 1, 1, 2500, 2500, null]
 
-combat(unitA, unitB)
 
 #larger units move slower through difficult terrain (at least until modern era)
 #
-func combat(unitA: Array, unitB : Array):
+static func combat(unitA: Array, unitB : Array):
 	while (unitA[5] > .85 && unitB[5] > .85):
 		print("balls")
