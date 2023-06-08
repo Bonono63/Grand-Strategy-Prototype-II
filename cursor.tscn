@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://cr7ahmi12cp6h"]
+
+[ext_resource type="Texture2D" path="res://mouse cursor 2.png" id="1_2sveu"]
+[ext_resource type="Script" path="res://cursor.gd" id="1_plqm3"]
+
+[node name="Cursor Manager" type="CanvasLayer"]
+script = ExtResource("1_plqm3")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_2sveu")
+centered = false
