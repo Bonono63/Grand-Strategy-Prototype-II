@@ -9,7 +9,7 @@ var map = _map.new()
 var terrain_texture : ImageTexture
 var minimap_drag = false
 var drag : Vector2
-var minimap_size : Vector2 #= Vector2(map.length+4, map.width+4)
+var minimap_size : Vector2
 
 @export_range(0,1) var sea_level = .4
 @export_range(0,1) var coast_height = .475
@@ -61,13 +61,7 @@ func unitFightingEqual(unit : Array): #simulates combat between 2 units with the
 
 func _ready():
 	map.connect("map_loaded", Callable(self, "on_map_loaded"))
-	#open("res://cool.png")
 	generate_world(Vector2(512,512),seed)
-	#generate_terrain_map()
-	#update_terrain_map()
-	
-	#inspector_update(0,0)
-	#save("user://save__01.png")
 
 func on_map_loaded():
 	print("map loaded")
@@ -76,12 +70,10 @@ func on_map_loaded():
 	generate_terrain_map()
 	update_terrain_map()
 	world_collision_setup()
-	#save("res://cool.png")
 
 func _process(_delta):
 	update_minimap()
 	update_camera_outline()
-	#inspector_update(0,0)
 
 #open a previous world
 func open(open_path : String) -> void:
@@ -247,26 +239,25 @@ func generate_world(size : Vector2 , _seed : int):
 					moisture.DRY:
 						match temp:
 							temperature.HOT:
-								terrain[x][y] = map.terrain_types.hot_dry # desert
+								terrain[x][y] = map.terrain_types.desert # desert
 							temperature.WARM:
-								terrain[x][y] = map.terrain_types.warm_dry # plains
+								terrain[x][y] = map.terrain_types.plains # plains
 					moisture.MOIST:
 						match temp:
 							temperature.HOT:
-								terrain[x][y] = map.terrain_types.warm_dry # plains
+								terrain[x][y] = map.terrain_types.plains # plains
 							temperature.WARM:
-								terrain[x][y] = map.terrain_types.warm_moist # forest
+								terrain[x][y] = map.terrain_types.forest # forest
 					moisture.WET:
 						match temp:
 							temperature.HOT:
-								terrain[x][y] = map.terrain_types.hot_wet # jungle
+								terrain[x][y] = map.terrain_types.jungle # jungle
 							temperature.WARM:
-								terrain[x][y] = map.terrain_types.warm_wet # swamp
+								terrain[x][y] = map.terrain_types.swamp # swamp
 	
 	map.terrain = terrain
 	
 	map.emit_signal("map_loaded")
-
 
 func generate_terrain_map() -> void:
 	var image : Image
@@ -283,22 +274,16 @@ func generate_terrain_map() -> void:
 					image.set_pixel(x,y,Color.SEASHELL) # shore
 				map.terrain_types.mountain:
 					image.set_pixel(x,y,Color.DIM_GRAY) # mountain
-				map.terrain_types.cold_dry:
-					image.set_pixel(x,y,Color.WEB_GRAY) # polar desert
-				map.terrain_types.cold_moist:
-					image.set_pixel(x,y,Color.TEAL) # tundra
-				map.terrain_types.warm_dry:
+				map.terrain_types.plains:
 					image.set_pixel(x,y,Color.LAWN_GREEN) # plains
-				map.terrain_types.warm_moist:
+				map.terrain_types.forest:
 					image.set_pixel(x,y,Color.DARK_GREEN) # forest
-				map.terrain_types.warm_wet:
+				map.terrain_types.swamp:
 					image.set_pixel(x,y,Color("6d490f")) # swamp
-				map.terrain_types.hot_dry:
+				map.terrain_types.desert:
 					image.set_pixel(x,y,Color(1, 0.870588, 0.501961, 1)) # desert
-				map.terrain_types.hot_wet:
+				map.terrain_types.jungle:
 					image.set_pixel(x,y,Color("008264")) # jungle
-				map.terrain_types.shallow_water:
-					image.set_pixel(x,y,Color.DEEP_SKY_BLUE) # river
 				_:
 					image.set_pixel(x,y,Color.TRANSPARENT)
 	
@@ -319,13 +304,8 @@ func update_minimap() -> void:
 	$GUI/Minimap/TextureRect.texture = terrain_texture
 	
 	var collision_position = Vector2((minimap_size.x/2),(minimap_size.y/2))
-	#$GUI/Minimap/Area2D.position = collision_position
 	$GUI/Minimap/Area2D/CollisionShape2D.position = collision_position
-	#print($GUI/Minimap/Area2D/CollisionShape2D.position)
-	#$GUI/Minimap/Area2D/CollisionShape2D/ColorRect.position = collision_position
-	#print($GUI/Minimap/Area2D/CollisionShape2D/ColorRect.position)
 	$GUI/Minimap/Area2D/CollisionShape2D.shape.size = minimap_size
-	#$GUI/Minimap/Area2D/CollisionShape2D/ColorRect.size = minimap_size
 
 func update_camera_outline() -> void:
 	var camera_outline_size : Vector2
@@ -333,15 +313,12 @@ func update_camera_outline() -> void:
 	var aspect_ratio : Vector2 = Vector2(get_viewport().size.x, get_viewport().size.y).normalized()
 	
 	camera_outline_size = Vector2(camera.position.y*aspect_ratio.x,camera.position.y*aspect_ratio.y)
-	#camera_inner_size = Vector2(camera.position.y*0.8,camera.position.y*0.8)
 	camera_position = Vector2((camera.position.x)-camera_outline_size.x/2,camera.position.z+map.width-camera_outline_size.y/2)
 	$GUI/Minimap/camera_outline.size = camera_outline_size
 	$GUI/Minimap/camera_outline.position = camera_position
 	
 	if (minimap_drag):
 		var minimap_x = map.length-(get_viewport().size.x-drag.x)
-		#print(drag.x)
-		#print(minimap_x)
 		camera.position = Vector3(minimap_x, camera.position.y, drag.y-get_viewport().size.y)
 
 func minimap_input_event(_a, event, _c):
@@ -353,7 +330,6 @@ func minimap_input_event(_a, event, _c):
 			minimap_drag = false
 
 func world_collision_setup():
-	#await map.map_loaded
 	print("length: ", map.length, " width: ", map.width)
 	var collision_shape : Vector3 = Vector3(map.length, 0, map.width)
 	$"World Collision/CollisionShape3D".shape.size = collision_shape
@@ -363,9 +339,7 @@ func world_collision_setup():
 
 func world_input_event(a, event, _position, d, e):
 	if event is InputEventMouseButton:
-		if event.is_action_pressed("left_click"):
-			print("left click, postion: ", _position)
-			print("left click, postion (int): (", int(_position.x), ", ", int(_position.y), ", ", int(_position.z), ")")
+		if event.is_action_released("left_click"):
 			inspector_update(int(_position.x),int(_position.z))
 
 func inspector_update(x: int,y : int):
@@ -384,7 +358,6 @@ func inspector_update(x: int,y : int):
 	inspector.position = inspector_position
 	
 	coords.text = str("Coordinates: ", x+1, ", ", abs(y))
-	#print($"GUI/location Inspector/info".position.x)
 	var info_position : Vector2 = Vector2(0, info.position.x+coords.size.y)
 	info.position = info_position
 	if (map.terrain[x][y] <= map.terrain_types.size()):

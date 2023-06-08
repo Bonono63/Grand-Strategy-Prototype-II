@@ -12,15 +12,11 @@ enum terrain_types {
 	shore,
 	shallow_water,
 	mountain,
-	cold_dry,
-	cold_moist,
-	cold_wet,
-	warm_dry,
-	warm_moist,
-	warm_wet,
-	hot_dry,
-	hot_moist,
-	hot_wet,
+	plains,
+	forest,
+	swamp,
+	desert,
+	jungle,
 }
 
 enum building_types {
@@ -28,7 +24,7 @@ enum building_types {
 	town,
 	castle,
 	moat,
-	farm
+	farm,
 }
 
 var terrain : Array

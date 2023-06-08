@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://daono88iy1yu0"]
 
-[ext_resource type="Script" path="res://Camera3D.gd" id="1_f5w4m"]
+[ext_resource type="Script" path="res://World/Camera3D.gd" id="1_f5w4m"]
 
 [node name="Node3D" type="Node3D"]
 process_mode = 3

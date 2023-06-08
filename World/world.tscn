@@ -1,9 +1,9 @@
 [gd_scene load_steps=11 format=3 uid="uid://cr2mhoqo7014t"]
 
-[ext_resource type="Script" path="res://World.gd" id="1_wrylp"]
-[ext_resource type="Script" path="res://World Collision.gd" id="2_3dlbw"]
-[ext_resource type="PackedScene" uid="uid://daono88iy1yu0" path="res://camera.tscn" id="2_rj17n"]
-[ext_resource type="Script" path="res://minimap_collision.gd" id="4_pjcvx"]
+[ext_resource type="Script" path="res://World/World.gd" id="1_wrylp"]
+[ext_resource type="Script" path="res://World/World Collision.gd" id="2_3dlbw"]
+[ext_resource type="PackedScene" uid="uid://daono88iy1yu0" path="res://World/camera.tscn" id="2_rj17n"]
+[ext_resource type="Script" path="res://UI/minimap_collision.gd" id="4_pjcvx"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_50lk0"]
 size = Vector3(1, 0, 1)
