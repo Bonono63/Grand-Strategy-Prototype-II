@@ -1,25 +1,34 @@
 class_name _map
 extends Node
 
+signal map_loaded
+
 const MAX_VALUE = 256
 var length
 var width
 
 enum terrain_types {
-	plains,
-	forest,
-	desert,
-	moutains,
-	river,
-	shore,
 	ocean,
+	shore,
+	shallow_water,
+	mountain,
+	cold_dry,
+	cold_moist,
+	cold_wet,
+	warm_dry,
+	warm_moist,
+	warm_wet,
+	hot_dry,
+	hot_moist,
+	hot_wet,
 }
 
 enum building_types {
 	empty,
-	city,
-	fort,
+	town,
+	castle,
 	moat,
+	farm
 }
 
 var terrain : Array
