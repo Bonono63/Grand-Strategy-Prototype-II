@@ -11,8 +11,6 @@ func _ready():
 	Input.set_custom_mouse_cursor(empty_cursor, input.CURSOR_ARROW)
 	get_tree().connect("screen_resized", self, "update_cursor")
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	$Sprite.global_position = $sprite.get_global_mouse_position()
 
