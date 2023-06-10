@@ -22,7 +22,7 @@ var minimap_size : Vector2
 @export_range(0,1) var dry_cutoff = .65
 @export_range(0,1) var moist_cutoff = .8
 
-@export_range(0,1) var river_moisture_cutoff = .91
+@export_range(0,1) var river_moisture_cutoff = .875
 @export_range(0,1) var river_cutoff = .955
 @export_range(0,1) var river_moisture_addition = 0.25
 
@@ -150,10 +150,9 @@ func save(save_path : String) -> void:
 	for x in map.length:
 		for y in map.width:
 			var color : Color
-			
 			color.r8 = map.terrain[x][y]
-			#print(color.r8, " ", color.g8, " ", color.b8)
-			#print("tile value: ", map.terrain[x][y], "color value: ", color.r8)
+			
+			# TODO Save buildings and territory to the save file
 			#color.g8 = map.building[x][y]
 			#color.b8 = map.territory[x][y]
 			image.set_pixel(x,y,color)
