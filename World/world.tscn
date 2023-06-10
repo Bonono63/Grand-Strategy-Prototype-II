@@ -58,6 +58,7 @@ World = NodePath("..")
 [node name="GUI" type="CanvasLayer" parent="."]
 
 [node name="Minimap" type="ColorRect" parent="GUI"]
+visible = false
 offset_right = 40.0
 offset_bottom = 40.0
 mouse_filter = 1
@@ -117,3 +118,15 @@ layout_mode = 0
 offset_right = 40.0
 offset_bottom = 23.0
 text = "info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info v"
+
+[node name="minimap_toggle" type="Button" parent="GUI"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -23.0
+offset_top = -31.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "M"

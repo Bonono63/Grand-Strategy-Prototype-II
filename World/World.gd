@@ -55,6 +55,7 @@ func _init():
 
 func _unhandled_input(event):
 	if event is InputEventKey:
+		# open settings menu or close it
 		if event.is_action_pressed("ui_cancel"):
 			if !pause:
 				var pause_menu = preload("res://Menus/pause_menu.tscn").instantiate()
@@ -65,6 +66,7 @@ func _unhandled_input(event):
 				pause = false
 				remove_child(get_child(-1))
 
+# can be called anywhere to return to the main menu
 func return_to_main_menu():
 	get_tree().change_scene_to_file("res://Menus/main_menu.tscn")
 	self.queue_free()
@@ -87,12 +89,18 @@ func unitFightingEqual(unit : Array): #simulates combat between 2 units with the
 func _ready():
 	map.connect("map_loaded", Callable(self, "on_map_loaded"))
 
+func on_minimap_toggle():
+	if minimap.visible:
+		minimap.hide()
+	else:
+		minimap.show()
+
 func on_map_loaded():
 	print("map loaded")
 	$GUI/Minimap/Area2D.connect("collision", minimap_input_event)
+	$GUI/minimap_toggle.connect("button_down", on_minimap_toggle)
 	$"World Collision".connect("collision", world_input_event)
 	generate_terrain_map()
-	#print(terrain_texture)
 	update_terrain_map()
 	world_collision_setup()
 
@@ -302,7 +310,7 @@ func generate_terrain_map() -> void:
 				map.terrain_types.shallow_water:
 					image.set_pixel(x,y,Color(0.1, 0.5, 0.6, 1)) # coast
 				map.terrain_types.shore:
-					image.set_pixel(x,y,Color.SEASHELL) # shore
+					image.set_pixel(x,y,Color("eddfa8")) # shore
 				map.terrain_types.mountain:
 					image.set_pixel(x,y,Color.DIM_GRAY) # mountain
 				map.terrain_types.plains:
