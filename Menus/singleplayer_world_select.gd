@@ -1,23 +1,53 @@
 extends Control
 
-@onready var generate_button = $Generate
-@onready var load_button = $Load
 @onready var return_button = $Panel/Return
+@onready var save_list = $Panel/SaveList
+@onready var open_button = $Panel/open
+@onready var new_button = $Panel/new
 
+var selected_save : String
 
-# Called when the node enters the scene tree for the first time.
 func _ready():
-	get_tree().get_root().connect("size_changed", Callable(self, "resolution_change"))
 	return_button.connect("button_down", Callable(self, "return_button_button_pressed"))
-	resolution_change()
+	new_button.connect("button_down", Callable(self, "new_button_pressed"))
+	save_list.connect("item_selected", Callable(self, "save_selected"))
+	open_button.connect("button_down", Callable(self, "open_button_button_pressed"))
+	get_saves()
 
-func resolution_change():
-	var aspect_ratio = Vector2(get_viewport().get_size().x, get_viewport().get_size().y).normalized()
-	#$Panel.position = Vector2(0,0)
-	#$Panel.size = Vector2(aspect_ratio.x*1000,aspect_ratio.y*1000)
+func _process(_delta):
+	if selected_save.is_empty():
+		open_button.disabled = true
 
-func generate_button_pressed():
-	get_tree().change_scene_to_file("res://Menus/singleplayer_world_select.tscn")
+func new_button_pressed():
+	var world = preload("res://World/world.tscn").instantiate()
+	world.init("")
+	get_tree().get_root().add_child(world)
+	get_tree().change_scene_to_packed(world)
+	self.queue_free()
 
 func return_button_button_pressed():
 	get_tree().change_scene_to_file("res://Menus/main_menu.tscn")
+
+func open_button_button_pressed():
+	var world = preload("res://World/world.tscn").instantiate()
+	world.init("user://"+selected_save)
+	get_tree().get_root().add_child(world)
+	get_tree().change_scene_to_packed(world)
+	self.queue_free()
+
+func save_selected(index : int):
+	open_button.disabled = false
+	selected_save = save_list.get_item_text(index)
+	#print(selected_save)
+
+func get_saves() -> void:
+	var dir = DirAccess.open("user://")
+	if dir:
+		dir.list_dir_begin()
+		var file_name = dir.get_next()
+		
+		while file_name != "":
+			#print(file_name)
+			if file_name.ends_with(".png"):
+				save_list.add_item(file_name)
+			file_name = dir.get_next()

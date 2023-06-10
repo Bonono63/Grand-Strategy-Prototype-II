@@ -1,6 +1,14 @@
-[gd_scene load_steps=2 format=3 uid="uid://cjc7h07yodc6"]
+[gd_scene load_steps=3 format=3 uid="uid://cjc7h07yodc6"]
 
 [ext_resource type="Script" path="res://Menus/singleplayer_world_select.gd" id="1_ne42t"]
+
+[sub_resource type="GDScript" id="GDScript_r37eo"]
+script/source = "extends ItemList
+
+
+#func item_selected():
+#	
+"
 
 [node name="Singleplayer World Select" type="Control"]
 layout_mode = 3
@@ -21,7 +29,7 @@ anchor_bottom = 0.5
 offset_left = -250.0
 offset_top = -250.0
 offset_right = 250.0
-offset_bottom = 250.0
+offset_bottom = 284.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -40,17 +48,37 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Return"
 
-[node name="Button" type="Button" parent="."]
-layout_mode = 0
-offset_right = 8.0
-offset_bottom = 8.0
+[node name="SaveList" type="ItemList" parent="Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -218.0
+offset_top = -192.0
+offset_right = 219.0
+offset_bottom = 215.0
+grow_horizontal = 2
+grow_vertical = 2
+max_text_lines = 10
+script = SubResource("GDScript_r37eo")
 
-[node name="Button2" type="Button" parent="."]
+[node name="open" type="Button" parent="Panel"]
 layout_mode = 0
-offset_right = 8.0
-offset_bottom = 8.0
+offset_left = 45.0
+offset_top = 490.0
+offset_right = 95.0
+offset_bottom = 521.0
+disabled = true
+text = "Open
+"
 
-[node name="Button3" type="Button" parent="."]
+[node name="new" type="Button" parent="Panel"]
 layout_mode = 0
-offset_right = 8.0
-offset_bottom = 8.0
+offset_left = 405.0
+offset_top = 490.0
+offset_right = 448.0
+offset_bottom = 521.0
+text = "New
+"

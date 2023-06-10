@@ -26,6 +26,15 @@ var minimap_size : Vector2
 @export_range(0,1) var river_cutoff = .955
 @export_range(0,1) var river_moisture_addition = 0.25
 
+var pause : bool
+
+# initialize the world settings etc. (basically decide whether to load or generate a world)
+func init(_save : String):
+	if _save.is_empty():
+		generate_world(Vector2(512,512),seed)
+	else:
+		open(_save)
+
 func _init():
 	seed = randi()
 	
@@ -42,8 +51,24 @@ func _init():
 	#unitFightingEqual(unit)
 	#var unitA = [100, 50, 10, 1, 1, 1, 5000, 5000, null]
 	#var unitB = [50, 25, 20, 1, 1, 1, 2500, 2500, null]
-	#division.combat(unitA, unitB)
-   
+	#division.combat(unitA, unitB
+
+func _unhandled_input(event):
+	if event is InputEventKey:
+		if event.is_action_pressed("ui_cancel"):
+			if !pause:
+				var pause_menu = preload("res://Menus/pause_menu.tscn").instantiate()
+				add_child(pause_menu)
+				pause_menu.exit_button.connect("button_down", Callable(self, "return_to_main_menu"))
+				pause = true
+			else:
+				pause = false
+				remove_child(get_child(-1))
+
+func return_to_main_menu():
+	get_tree().change_scene_to_file("res://Menus/main_menu.tscn")
+	self.queue_free()
+
 func unitFightingEqual(unit : Array): #simulates combat between 2 units with the same stats
 	var combat_cycles : int
 	
@@ -61,15 +86,18 @@ func unitFightingEqual(unit : Array): #simulates combat between 2 units with the
 
 func _ready():
 	map.connect("map_loaded", Callable(self, "on_map_loaded"))
-	generate_world(Vector2(512,512),seed)
 
 func on_map_loaded():
 	print("map loaded")
 	$GUI/Minimap/Area2D.connect("collision", minimap_input_event)
 	$"World Collision".connect("collision", world_input_event)
 	generate_terrain_map()
+	#print(terrain_texture)
 	update_terrain_map()
 	world_collision_setup()
+
+func on_generate_map_texture():
+	terrain_renderer.texture = terrain_texture
 
 func _process(_delta):
 	update_minimap()
@@ -85,51 +113,56 @@ func open(open_path : String) -> void:
 	map.width = image.get_height()
 	
 	var terrain : Array
-	var building : Array
-	var territory : Array
+	#var building : Array
+	#var territory : Array
 	
 	utils.initate_2d_array(terrain, map.length, map.width)
-	utils.initate_2d_array(building, map.length, map.width)
-	utils.initate_2d_array(territory, map.length, map.width)
+	#utils.initate_2d_array(building, map.length, map.width)
+	#utils.initate_2d_array(territory, map.length, map.width)
 	
 	for x in map.length:
 		for y in map.width:
-			var color = image.get_pixel(x,y)
+			var color : Color = image.get_pixel(x,y)
 			terrain[x][y] = color.r8
-			building[x][y] = color.g8
-			territory[x][y] = color.b8
+			#building[x][y] = color.g8
+			#territory[x][y] = color.b8
 	
 	map.terrain = terrain
-	map.building = building
-	map.territory = territory
+	
+	#PAIN
+	await ready
 	
 	map.emit_signal("map_loaded")
 
 #save the current world
 func save(save_path : String) -> void:
 	var image : Image
-	image = Image.create(map.length, map.width, false, Image.FORMAT_RGB8)
+	image = Image.create(map.length, map.width, false, Image.FORMAT_RGBA8)
 	
 	for x in map.length:
 		for y in map.width:
 			var color : Color
+			
 			color.r8 = map.terrain[x][y]
+			#print(color.r8, " ", color.g8, " ", color.b8)
+			#print("tile value: ", map.terrain[x][y], "color value: ", color.r8)
 			#color.g8 = map.building[x][y]
 			#color.b8 = map.territory[x][y]
 			image.set_pixel(x,y,color)
 	
-	image.save_png(save_path)
+	image.save_png("user://"+save_path+".png")
+	print("game saved to: ", "user://", save_path)
 
 enum moisture { DRY, MOIST, WET }
 enum temperature { COLD, WARM, HOT }
 
 #generate a world
-func generate_world(size : Vector2 , _seed : int):
+func generate_world(size : Vector2i , _seed : int):
 	print("generating world")
 	map.length = int(size.x)
 	map.width = int(size.y)
-	print(map.length)
-	print(map.width)
+	#print(map.length)
+	#print(map.width)
 	
 	var height_map_noise = FastNoiseLite.new()
 	var moisture_map_noise = FastNoiseLite.new()
@@ -144,7 +177,6 @@ func generate_world(size : Vector2 , _seed : int):
 	moisture_map_noise.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
 	moisture_map_noise.seed = randi()
 	moisture_map_noise.frequency = 0.0075
-	#moisture_map_noise.fractal_type = FastNoiseLite.FRACTAL_FBM
 	
 	temperature_map_noise.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
 	temperature_map_noise.seed = randi()
@@ -260,8 +292,7 @@ func generate_world(size : Vector2 , _seed : int):
 	map.emit_signal("map_loaded")
 
 func generate_terrain_map() -> void:
-	var image : Image
-	image = Image.create(map.length, map.width, false, Image.FORMAT_RGBA8)
+	var image : Image = Image.create(map.length, map.width, false, Image.FORMAT_RGBA8)
 	
 	for x in map.length:
 		for y in map.width:
@@ -287,8 +318,8 @@ func generate_terrain_map() -> void:
 				_:
 					image.set_pixel(x,y,Color.TRANSPARENT)
 	
-	var texture : ImageTexture
-	texture = ImageTexture.create_from_image(image)
+	var texture : ImageTexture = ImageTexture.create_from_image(image)
+	texture.update(image)
 	
 	terrain_texture = texture
 
@@ -299,7 +330,6 @@ func update_minimap() -> void:
 	minimap_size = Vector2(map.length+4, map.width+4)
 	minimap.set_size(minimap_size, false)
 	var screen_size : Vector2 = get_viewport().size
-	var minimap_position = Vector2(screen_size.x-(minimap_size.x/2), screen_size.y-(minimap_size.y/2))
 	minimap.position = Vector2(screen_size.x-minimap_size.x, screen_size.y-minimap_size.y)
 	$GUI/Minimap/TextureRect.texture = terrain_texture
 	
@@ -330,14 +360,14 @@ func minimap_input_event(_a, event, _c):
 			minimap_drag = false
 
 func world_collision_setup():
-	print("length: ", map.length, " width: ", map.width)
+	#print("length: ", map.length, " width: ", map.width)
 	var collision_shape : Vector3 = Vector3(map.length, 0, map.width)
 	$"World Collision/CollisionShape3D".shape.size = collision_shape
 	
 	$"World Collision/CollisionShape3D".position.x = map.length/2
 	$"World Collision/CollisionShape3D".position.y = map.width/2
 
-func world_input_event(a, event, _position, d, e):
+func world_input_event(_a, event, _position, _d, _e):
 	if event is InputEventMouseButton:
 		if event.is_action_released("left_click"):
 			inspector_update(int(_position.x),int(_position.z))
