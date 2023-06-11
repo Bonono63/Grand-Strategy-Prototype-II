@@ -1,13 +1,12 @@
 extends CanvasLayer
 
 @export var default_cursor : Texture = null
+@export var empty_cursor : Texture = null
 @export var base_window_size : Vector2 = Vector2.ZERO
 @export var base_cursor_size : Vector2 = Vector2.ZERO
 
 func _ready():
 	update_cursor()
-	
-	var empty_cursor : ImageTexture
 	
 	Input.set_custom_mouse_cursor(null, Input.CURSOR_ARROW)
 	get_tree().connect("screen_resized", Callable(self, "update_cursor"))
