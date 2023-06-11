@@ -9,7 +9,6 @@ const rotation_control_enabled = false
 
 @export var zoom_speed = 0.09
 @export var mouse_sensitivity = 0.05
-@export var World : Node3D
 
 var zoom = default_zoom
 
@@ -98,8 +97,8 @@ func _process(_delta):
 	position.y = clamp(position.y, min_zoom, max_zoom)
 	
 	#position.x = clamp(position.x, 0,)
-	position.x = clamp(position.x, 0, World.map.length)
-	position.z = clamp(position.z, -World.map.width, 0)
+	position.x = clamp(position.x, 0, Map.length)
+	position.z = clamp(position.z, -Map.width, 0)
 	
 	x = 0
 	y = 0

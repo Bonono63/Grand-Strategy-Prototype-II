@@ -51,9 +51,8 @@ environment = SubResource("Environment_gpl8t")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.409326, 0.631342, -0.65868, -0.850898, -0.00360818, 0.525318, 0.329279, 0.775496, 0.538685, 0, 94.8562, 0)
 
-[node name="Camera" parent="." node_paths=PackedStringArray("World") instance=ExtResource("2_rj17n")]
+[node name="Camera" parent="." instance=ExtResource("2_rj17n")]
 transform = Transform3D(1, 0, 0, 0, 0.258819, 0.965926, 0, -0.965926, 0.258819, 0, 0, 0)
-World = NodePath("..")
 
 [node name="GUI" type="CanvasLayer" parent="."]
 

@@ -1,7 +1,6 @@
 extends Node3D
 
 var seed
-var map = _map.new()
 @onready var terrain_renderer = $Terrain
 @onready var minimap = $GUI/Minimap
 @onready var camera = $Camera
@@ -10,6 +9,8 @@ var terrain_texture : ImageTexture
 var minimap_drag = false
 var drag : Vector2
 var minimap_size : Vector2
+
+var queue = _queue.new()
 
 @export_range(0,1) var sea_level = .4
 @export_range(0,1) var coast_height = .475
@@ -28,8 +29,12 @@ var minimap_size : Vector2
 
 var pause : bool
 
+signal finish_setup
+
 # initialize the world settings etc. (basically decide whether to load or generate a world)
 func init(_save : String):
+	Queue.clear_queue()
+	#Map.clear()
 	if _save.is_empty():
 		generate_world(Vector2(512,512),seed)
 	else:
@@ -87,7 +92,7 @@ func unitFightingEqual(unit : Array): #simulates combat between 2 units with the
 	print(unit[4], " unit's remaining strength") 
 
 func _ready():
-	map.connect("map_loaded", Callable(self, "on_map_loaded"))
+	Map.connect("map_loaded", Callable(self, "on_map_loaded"))
 
 func on_minimap_toggle():
 	if minimap.visible:
@@ -103,6 +108,9 @@ func on_map_loaded():
 	generate_terrain_map()
 	update_terrain_map()
 	world_collision_setup()
+	
+	#player selects starting city location
+	pick_starting_city()
 
 func on_generate_map_texture():
 	terrain_renderer.texture = terrain_texture
@@ -117,44 +125,43 @@ func open(open_path : String) -> void:
 	var image : Image
 	image = Image.load_from_file(open_path)
 	
-	map.length = image.get_width()
-	map.width = image.get_height()
+	Map.length = image.get_width()
+	Map.width = image.get_height()
 	
-	var terrain : Array
-	#var building : Array
-	#var territory : Array
+	var tile_map : Array
+	utils.initate_2d_array(tile_map, Map.length, Map.width)
 	
-	utils.initate_2d_array(terrain, map.length, map.width)
-	#utils.initate_2d_array(building, map.length, map.width)
-	#utils.initate_2d_array(territory, map.length, map.width)
-	
-	for x in map.length:
-		for y in map.width:
+	for x in Map.length:
+		for y in Map.width:
 			var color : Color = image.get_pixel(x,y)
-			terrain[x][y] = color.r8
-			#building[x][y] = color.g8
-			#territory[x][y] = color.b8
+			var _tile = tile.new()
+			_tile.terrain_type = color.r8
+			_tile.building.type = color.g8
+			_tile.controller = color.b8
+			
+			tile_map[x][y] = _tile
 	
-	map.terrain = terrain
+	Map.tile_map = tile_map
 	
 	#PAIN
 	await ready
 	
-	map.emit_signal("map_loaded")
+	Map.emit_signal("map_loaded")
 
 #save the current world
 func save(save_path : String) -> void:
 	var image : Image
-	image = Image.create(map.length, map.width, false, Image.FORMAT_RGBA8)
+	image = Image.create(Map.length, Map.width, false, Image.FORMAT_RGBA8)
 	
-	for x in map.length:
-		for y in map.width:
+	for x in Map.length:
+		for y in Map.width:
 			var color : Color
-			color.r8 = map.terrain[x][y]
-			
-			# TODO Save buildings and territory to the save file
-			#color.g8 = map.building[x][y]
-			#color.b8 = map.territory[x][y]
+			#tile type
+			color.r8 = Map.tile_map[x][y].terrain_type
+			#building type
+			color.g8 = Map.tile_map[x][y].building.type
+			#controller type
+			color.b8 = Map.tile_map[x][y].controller
 			image.set_pixel(x,y,color)
 	
 	image.save_png("user://"+save_path+".png")
@@ -166,8 +173,8 @@ enum temperature { COLD, WARM, HOT }
 #generate a world
 func generate_world(size : Vector2i , _seed : int):
 	print("generating world")
-	map.length = int(size.x)
-	map.width = int(size.y)
+	Map.length = int(size.x)
+	Map.width = int(size.y)
 	#print(map.length)
 	#print(map.width)
 	
@@ -232,31 +239,31 @@ func generate_world(size : Vector2i , _seed : int):
 			if river_image.get_pixel(x,y).r >= river_moisture_cutoff:
 				moisture_image.set_pixel(x,y, Color(moisture_image.get_pixel(x,y).r+river_moisture_addition, moisture_image.get_pixel(x,y).g+river_moisture_addition, moisture_image.get_pixel(x,y).b+river_moisture_addition))
 	
-	var terrain : Array
-	utils.initate_2d_array(terrain, size.x, size.y)
+	var tile_map : Array
+	utils.initate_2d_array(tile_map, size.x, size.y)
 	
 	for x in size.x:
 		for y in size.y:
-			
+			var _tile = tile.new()
 			#ocean
 			if height_image.get_pixel(x,y).r <= sea_level:
-				terrain[x][y] = map.terrain_types.ocean
+				_tile.terrain_type = Map.terrain_types.ocean
 			
 			#coast
 			else :if height_image.get_pixel(x,y).r <= coast_height:
-				terrain[x][y] = map.terrain_types.shallow_water
+				_tile.terrain_type = Map.terrain_types.shallow_water
 			
 			#river gen
 			else :if river_image.get_pixel(x,y).r >= river_cutoff:
-				terrain[x][y] = map.terrain_types.shallow_water
+				_tile.terrain_type = Map.terrain_types.shallow_water
 			
 			#shore
 			else: if height_image.get_pixel(x,y).r <= shore_height:
-				terrain[x][y] = map.terrain_types.shore
+				_tile.terrain_type = Map.terrain_types.shore
 			
 			#moutains
 			else: if height_image.get_pixel(x,y).r >= mountain_height:
-				terrain[x][y] = map.terrain_types.mountain
+				_tile.terrain_type = Map.terrain_types.mountain
 			
 			else: 
 				var moist
@@ -278,49 +285,52 @@ func generate_world(size : Vector2i , _seed : int):
 					moisture.DRY:
 						match temp:
 							temperature.HOT:
-								terrain[x][y] = map.terrain_types.desert # desert
+								_tile.terrain_type = Map.terrain_types.desert # desert
 							temperature.WARM:
-								terrain[x][y] = map.terrain_types.plains # plains
+								_tile.terrain_type = Map.terrain_types.plains # plains
 					moisture.MOIST:
 						match temp:
 							temperature.HOT:
-								terrain[x][y] = map.terrain_types.plains # plains
+								_tile.terrain_type = Map.terrain_types.plains # plains
 							temperature.WARM:
-								terrain[x][y] = map.terrain_types.forest # forest
+								_tile.terrain_type = Map.terrain_types.forest # forest
 					moisture.WET:
 						match temp:
 							temperature.HOT:
-								terrain[x][y] = map.terrain_types.jungle # jungle
+								_tile.terrain_type = Map.terrain_types.jungle # jungle
 							temperature.WARM:
-								terrain[x][y] = map.terrain_types.swamp # swamp
+								_tile.terrain_type = Map.terrain_types.swamp # swamp
+			tile_map[x][y] = _tile
 	
-	map.terrain = terrain
+	Map.tile_map = tile_map
 	
-	map.emit_signal("map_loaded")
+	Map.emit_signal("map_loaded")
 
 func generate_terrain_map() -> void:
-	var image : Image = Image.create(map.length, map.width, false, Image.FORMAT_RGBA8)
+	var image : Image = Image.create(Map.length, Map.width, false, Image.FORMAT_RGBA8)
 	
-	for x in map.length:
-		for y in map.width:
-			match (map.terrain[x][y]):
-				map.terrain_types.ocean:
+	var sand_color = Color(1, 0.870588, 0.501961, 1)
+	
+	for x in Map.length:
+		for y in Map.width:
+			match (Map.tile_map[x][y].terrain_type):
+				Map.terrain_types.ocean:
 					image.set_pixel(x,y,Color.DARK_BLUE) # ocean
-				map.terrain_types.shallow_water:
+				Map.terrain_types.shallow_water:
 					image.set_pixel(x,y,Color(0.1, 0.5, 0.6, 1)) # coast
-				map.terrain_types.shore:
-					image.set_pixel(x,y,Color("eddfa8")) # shore
-				map.terrain_types.mountain:
+				Map.terrain_types.shore:
+					image.set_pixel(x,y,sand_color) # shore
+				Map.terrain_types.mountain:
 					image.set_pixel(x,y,Color.DIM_GRAY) # mountain
-				map.terrain_types.plains:
+				Map.terrain_types.plains:
 					image.set_pixel(x,y,Color.LAWN_GREEN) # plains
-				map.terrain_types.forest:
+				Map.terrain_types.forest:
 					image.set_pixel(x,y,Color.DARK_GREEN) # forest
-				map.terrain_types.swamp:
+				Map.terrain_types.swamp:
 					image.set_pixel(x,y,Color("6d490f")) # swamp
-				map.terrain_types.desert:
-					image.set_pixel(x,y,Color(1, 0.870588, 0.501961, 1)) # desert
-				map.terrain_types.jungle:
+				Map.terrain_types.desert:
+					image.set_pixel(x,y,sand_color) # desert
+				Map.terrain_types.jungle:
 					image.set_pixel(x,y,Color("008264")) # jungle
 				_:
 					image.set_pixel(x,y,Color.TRANSPARENT)
@@ -334,7 +344,7 @@ func update_terrain_map() -> void:
 	terrain_renderer.texture = terrain_texture
 
 func update_minimap() -> void:
-	minimap_size = Vector2(map.length+4, map.width+4)
+	minimap_size = Vector2(Map.length+4, Map.width+4)
 	minimap.set_size(minimap_size, false)
 	var screen_size : Vector2 = get_viewport().size
 	minimap.position = Vector2(screen_size.x-minimap_size.x, screen_size.y-minimap_size.y)
@@ -350,12 +360,12 @@ func update_camera_outline() -> void:
 	var aspect_ratio : Vector2 = Vector2(get_viewport().size.x, get_viewport().size.y).normalized()
 	
 	camera_outline_size = Vector2(camera.position.y*aspect_ratio.x,camera.position.y*aspect_ratio.y)
-	camera_position = Vector2((camera.position.x)-camera_outline_size.x/2,camera.position.z+map.width-camera_outline_size.y/2)
+	camera_position = Vector2((camera.position.x)-camera_outline_size.x/2,camera.position.z+Map.width-camera_outline_size.y/2)
 	$GUI/Minimap/camera_outline.size = camera_outline_size
 	$GUI/Minimap/camera_outline.position = camera_position
 	
 	if (minimap_drag):
-		var minimap_x = map.length-(get_viewport().size.x-drag.x)
+		var minimap_x = Map.length-(get_viewport().size.x-drag.x)
 		camera.position = Vector3(minimap_x, camera.position.y, drag.y-get_viewport().size.y)
 
 func minimap_input_event(_a, event, _c):
@@ -368,11 +378,11 @@ func minimap_input_event(_a, event, _c):
 
 func world_collision_setup():
 	#print("length: ", map.length, " width: ", map.width)
-	var collision_shape : Vector3 = Vector3(map.length, 0, map.width)
+	var collision_shape : Vector3 = Vector3(Map.length, 0, Map.width)
 	$"World Collision/CollisionShape3D".shape.size = collision_shape
 	
-	$"World Collision/CollisionShape3D".position.x = map.length/2
-	$"World Collision/CollisionShape3D".position.y = map.width/2
+	$"World Collision/CollisionShape3D".position.x = Map.length/2
+	$"World Collision/CollisionShape3D".position.y = Map.width/2
 
 func world_input_event(_a, event, _position, _d, _e):
 	if event is InputEventMouseButton:
@@ -397,7 +407,27 @@ func inspector_update(x: int,y : int):
 	coords.text = str("Coordinates: ", x+1, ", ", abs(y))
 	var info_position : Vector2 = Vector2(0, info.position.x+coords.size.y)
 	info.position = info_position
-	if (map.terrain[x][y] <= map.terrain_types.size()):
-		info.text = str("Terrain: ", map.terrain_types.keys()[map.terrain[x][y]])
-	else:
-		info.text = str("Terrain: none")
+	
+	info.text = str("Terrain: ", Map.terrain_types.keys()[Map.tile_map[x][y].terrain_type], "\nBuilding: ", Map.building_types.keys()[Map.tile_map[x][y].building.type], "\nController: ", Map.tile_map[x][y].controller)
+
+func pick_starting_city():
+	var starting_city_prompt = preload("res://UI/starting_city_prompt.tscn").instantiate()
+	$GUI.add_child(starting_city_prompt)
+	var selected : bool = false
+	while (!selected):
+		var a = await $"World Collision".input_event
+		
+		var event = a[1]
+		var _position : Vector2i = Vector2i(a[2].x, a[2].z-1)
+		
+		if event != InputEventMouseButton:
+			if event.is_action_pressed("left_click"):
+				#print(a)
+				if Map.tile_map[_position.x][_position.y].terrain_type != Map.terrain_types.ocean and Map.tile_map[_position.x][_position.y].terrain_type != Map.terrain_types.shallow_water and Map.tile_map[_position.x][_position.y].terrain_type != Map.terrain_types.swamp:
+					print(Map.terrain_types.keys()[Map.tile_map[_position.x][_position.y].terrain_type])
+					Queue.add_command(Queue.types.construct_building, [_position.x, _position.y, Map.building_types.city_center])
+				#print("starting position: ", a[2])
+					selected = true
+					$GUI.remove_child(starting_city_prompt)
+				else:
+					starting_city_prompt.invalid_selection()
