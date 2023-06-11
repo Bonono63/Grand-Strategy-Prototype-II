@@ -29,6 +29,9 @@ var queue = _queue.new()
 
 var pause : bool
 
+signal tile_selection_changed
+signal starting_city_selection
+
 signal finish_setup
 
 # initialize the world settings etc. (basically decide whether to load or generate a world)
@@ -109,8 +112,16 @@ func on_map_loaded():
 	update_terrain_map()
 	world_collision_setup()
 	
-	#player selects starting city location
-	pick_starting_city()
+	Map.connect("tile_map_change", Callable(self, "on_tile_map_update"))
+	
+	connect("tile_selection_changed", Callable(self, "inspector_update"))
+	pick_starting_city_prompt()
+	connect("tile_selection_changed", Callable(self, "pick_starting_city"))
+	$GUI.get_child(-1).confirm_button.connect("button_down", Callable(self, "starting_city_selection_confirmed"))
+
+func on_tile_map_update():
+	generate_terrain_map()
+	update_terrain_map()
 
 func on_generate_map_texture():
 	terrain_renderer.texture = terrain_texture
@@ -387,13 +398,14 @@ func world_collision_setup():
 func world_input_event(_a, event, _position, _d, _e):
 	if event is InputEventMouseButton:
 		if event.is_action_released("left_click"):
-			inspector_update(int(_position.x),int(_position.z))
+			emit_signal("tile_selection_changed", Vector2i(int(_position.x),int(_position.z-1)))
 
-func inspector_update(x: int,y : int):
+func inspector_update(_position : Vector2i):
 	var info = $"GUI/location Inspector/info"
 	var coords = $"GUI/location Inspector/coords"
 	
-	y-=1
+	var x = _position.x
+	var y = _position.y
 	
 	inspector.show()
 	
@@ -410,24 +422,6 @@ func inspector_update(x: int,y : int):
 	
 	info.text = str("Terrain: ", Map.terrain_types.keys()[Map.tile_map[x][y].terrain_type], "\nBuilding: ", Map.building_types.keys()[Map.tile_map[x][y].building.type], "\nController: ", Map.tile_map[x][y].controller)
 
-func pick_starting_city():
+func pick_starting_city_prompt():
 	var starting_city_prompt = preload("res://UI/starting_city_prompt.tscn").instantiate()
 	$GUI.add_child(starting_city_prompt)
-	var selected : bool = false
-	while (!selected):
-		var a = await $"World Collision".input_event
-		
-		var event = a[1]
-		var _position : Vector2i = Vector2i(a[2].x, a[2].z-1)
-		
-		if event != InputEventMouseButton:
-			if event.is_action_pressed("left_click"):
-				#print(a)
-				if Map.tile_map[_position.x][_position.y].terrain_type != Map.terrain_types.ocean and Map.tile_map[_position.x][_position.y].terrain_type != Map.terrain_types.shallow_water and Map.tile_map[_position.x][_position.y].terrain_type != Map.terrain_types.swamp:
-					print(Map.terrain_types.keys()[Map.tile_map[_position.x][_position.y].terrain_type])
-					Queue.add_command(Queue.types.construct_building, [_position.x, _position.y, Map.building_types.city_center])
-				#print("starting position: ", a[2])
-					selected = true
-					$GUI.remove_child(starting_city_prompt)
-				else:
-					starting_city_prompt.invalid_selection()

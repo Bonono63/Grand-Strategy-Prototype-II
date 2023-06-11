@@ -24,6 +24,7 @@ enum building_types {
 	castle,
 	moat,
 	farm,
+	mill,
 }
 
 var tile_map : Array
