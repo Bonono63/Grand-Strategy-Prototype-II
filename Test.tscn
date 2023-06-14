@@ -1,0 +1,40 @@
+[gd_scene load_steps=5 format=3 uid="uid://llh8f0ewxd74"]
+
+[ext_resource type="Texture2D" uid="uid://rpfa5bwiwx82" path="res://Unit Icons/Infantry Division.png" id="2_5cvph"]
+[ext_resource type="Script" path="res://Unit.gd" id="2_b6ugp"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_nq8h6"]
+size = Vector2(32, 32)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pb0td"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+draw_center = false
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.415686, 0.870588, 1, 1)
+
+[node name="Units" type="Node2D"]
+
+[node name="Unit" type="CharacterBody2D" parent="." groups=["units"]]
+position = Vector2(-36, -3)
+
+[node name="Infantry" type="Sprite2D" parent="Unit"]
+texture_filter = 1
+position = Vector2(56, 23)
+texture = ExtResource("2_5cvph")
+script = ExtResource("2_b6ugp")
+
+[node name="UnitCollisionShape2D" type="CollisionShape2D" parent="Unit"]
+position = Vector2(56, 23)
+shape = SubResource("RectangleShape2D_nq8h6")
+
+[node name="Box" type="Panel" parent="Unit"]
+offset_left = 36.0
+offset_top = 3.0
+offset_right = 76.0
+offset_bottom = 43.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_pb0td")
+
+[connection signal="input_event" from="Unit" to="Unit/Infantry" method="_on_unit_input_event"]
