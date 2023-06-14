@@ -19,6 +19,7 @@ config/icon="res://UI/icon.svg"
 
 Queue="*res://World/Queue.gd"
 Map="*res://World/Map.gd"
+GlobalTime="*res://World/Time.gd"
 
 [display]
 
