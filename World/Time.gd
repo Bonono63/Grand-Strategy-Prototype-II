@@ -21,11 +21,6 @@ func _ready():
 		await get_tree().create_timer(check_speed(), false, false, true).timeout
 		count_up()
 
-func _process(_delta):
-	while ():
-		pass
-	pass
-
 # counts up game time
 func count_up():
 	print("count up")

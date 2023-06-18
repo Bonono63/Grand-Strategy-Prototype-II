@@ -32,29 +32,29 @@ var tile_map : Array
 #func _ready():
 #	Queue.connect("build", Callable(self, "add_building"))
 
-func set_terrain(arguments : Array):
-	var x = arguments[0]
-	var y = arguments[1]
-	var value = arguments[2]
+func clear(size : Vector2i):
+	length = size.x
+	width = size.y
+	utils.initate_2d_array(tile_map, length, width)
+	
+
+func set_terrain(x : int, y : int, value : int):
 	if x <= length && y <= width:
 		tile_map[x][y].tile_type = value
-		emit_signal("tile_map_change")
+		emit_signal("tile_map_change", Vector2i(x,y))
 	else:
 		print("terrain arguments where out of range")
 
 func add_building(x : int, y : int, value : int):
 	if x <= length && y <= width:
 		tile_map[x][y].building.type = value
-		emit_signal("tile_map_change")
+		emit_signal("tile_map_change", Vector2i(x,y))
 	else:
 		print("building arguments where out of range")
 
-func add_territory(arguments : Array):
-	var x = arguments[0]
-	var y = arguments[1]
-	var country_value = arguments[2]
+func add_territory(x : int, y : int, country_value : int):
 	if x <= length && y <= width:
 		tile_map[x][y].controller = country_value
-		emit_signal("tile_map_change")
+		emit_signal("tile_map_change", Vector2i(x,y))
 	else:
 		print("territory arguments where out of range")

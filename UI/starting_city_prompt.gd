@@ -12,7 +12,10 @@ func _ready():
 	confirm_button.connect("button_down", Callable(self, "confirmed"))
 
 func tile_selected(_position):
-	selected_tile = _position
+	if Map.tile_map[_position.x][_position.y].terrain_type != Map.terrain_types.ocean and Map.tile_map[_position.x][_position.y].terrain_type != Map.terrain_types.swamp and Map.tile_map[_position.x][_position.y].terrain_type != Map.terrain_types.shallow_water:
+		selected_tile = _position
+	else:
+		invalid_selection()
 
 func invalid_selection():
 	$Label.text = "Invalid Selection"

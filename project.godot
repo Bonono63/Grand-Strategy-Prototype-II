@@ -19,11 +19,9 @@ config/icon="res://UI/icon.svg"
 
 Queue="*res://World/Queue.gd"
 Map="*res://World/Map.gd"
-GlobalTime="*res://World/Time.gd"
 
 [display]
 
-mouse_cursor/custom_image="res://mouse cursor 2.png"
 mouse_cursor/tooltip_position_offset=Vector2(0, 0)
 
 [input]

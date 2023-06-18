@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3 uid="uid://dsy3gjcf7m0i3"]
+
+[ext_resource type="ArrayMesh" uid="uid://bp2sovy48l622" path="res://World/hexagon.obj" id="1_vbsda"]
+[ext_resource type="Script" path="res://World/tile_instance.gd" id="2_jrgu0"]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_ho3r6"]
+data = PackedVector3Array(-0.5, 0, -0.866, 0.5, 0, -0.866, -1, 0, 0, -1, 0, 0, 0.5, 0, -0.866, -0.5, 0, 0.866, -0.5, 0, 0.866, 0.5, 0, -0.866, 0.5, 0, 0.866, 0.5, 0, 0.866, 0.5, 0, -0.866, 1, 0, 0)
+
+[node name="Hex" type="MeshInstance3D"]
+mesh = ExtResource("1_vbsda")
+script = ExtResource("2_jrgu0")
+
+[node name="Area3D" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("ConcavePolygonShape3D_ho3r6")

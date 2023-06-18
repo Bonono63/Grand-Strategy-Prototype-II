@@ -1,13 +1,28 @@
-[gd_scene load_steps=13 format=3 uid="uid://cr2mhoqo7014t"]
+[gd_scene load_steps=16 format=3 uid="uid://cr2mhoqo7014t"]
 
 [ext_resource type="Script" path="res://World/World.gd" id="1_wrylp"]
-[ext_resource type="Script" path="res://World/World Collision.gd" id="2_3dlbw"]
 [ext_resource type="PackedScene" uid="uid://daono88iy1yu0" path="res://World/camera.tscn" id="2_rj17n"]
 [ext_resource type="Script" path="res://UI/minimap_collision.gd" id="4_pjcvx"]
 [ext_resource type="Script" path="res://selection.gd" id="5_kit5i"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_50lk0"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_olgbl"]
 size = Vector3(1, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_du2w6"]
+transparency = 1
+albedo_color = Color(0, 1, 1, 0.301961)
+
+[sub_resource type="BoxMesh" id="BoxMesh_0a72t"]
+material = SubResource("StandardMaterial3D_du2w6")
+size = Vector3(1, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cu2ct"]
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+
+[sub_resource type="MultiMesh" id="MultiMesh_3cdo6"]
+transform_format = 1
+use_colors = true
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_2v4oq"]
 sky_top_color = Color(0.32549, 0.619608, 0.823529, 1)
@@ -43,25 +58,27 @@ corner_radius_bottom_left = 2
 [node name="World" type="Node3D"]
 script = ExtResource("1_wrylp")
 
-[node name="Terrain" type="Sprite3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
-centered = false
-pixel_size = 1.0
-texture_filter = 0
+[node name="Map Input Events" type="Area3D" parent="."]
 
-[node name="World Collision" type="Area3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
-script = ExtResource("2_3dlbw")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Map Input Events"]
+shape = SubResource("BoxShape3D_olgbl")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="World Collision"]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0.1)
-shape = SubResource("BoxShape3D_50lk0")
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Map Input Events"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+visible = false
+mesh = SubResource("BoxMesh_0a72t")
+
+[node name="Terrain MultiMesh" type="MultiMeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -1, 8.74228e-08, 0, -8.74228e-08, -1, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_cu2ct")
+multimesh = SubResource("MultiMesh_3cdo6")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_gpl8t")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.409326, 0.631342, -0.65868, -0.850898, -0.00360818, 0.525318, 0.329279, 0.775496, 0.538685, 0, 94.8562, 0)
+light_energy = 1.25
 
 [node name="Camera" parent="." instance=ExtResource("2_rj17n")]
 transform = Transform3D(1, 0, 0, 0, 0.258819, 0.965926, 0, -0.965926, 0.258819, 0, 0, 0)
@@ -89,6 +106,7 @@ offset_right = 20.0
 offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
+flip_v = true
 
 [node name="camera_outline" type="ColorRect" parent="GUI/Minimap"]
 material = SubResource("CanvasItemMaterial_2vory")

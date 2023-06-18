@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://ddjxesxp8vub5"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_j65x1"]
+albedo_color = Color(1, 0, 0, 1)
+emission_enabled = true
+emission = Color(1, 0, 0, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_yqdf5"]
+material = SubResource("StandardMaterial3D_j65x1")
+radius = 0.05
+height = 0.1
+
+[node name="BADdot" type="MeshInstance3D"]
+mesh = SubResource("SphereMesh_yqdf5")
