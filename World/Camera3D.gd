@@ -2,7 +2,7 @@ extends Node3D
 
 const zoom_increment = 20
 const max_zoom = 1000
-@export var min_zoom = 3
+@export var min_zoom = 1
 const default_zoom = 50
 
 const rotation_control_enabled = false
@@ -14,8 +14,6 @@ var zoom = default_zoom
 
 var x = 0 
 var y = 0
-
-@export var width_clamp_modifier : float
 
 var position_control = false
 var rotation_control = false
@@ -99,8 +97,8 @@ func _process(_delta):
 	position.y = clamp(position.y, min_zoom, max_zoom)
 	
 	#position.x = clamp(position.x, 0,)
-	position.x = clamp(position.x, 0, Map.length*0.75)
-	position.z = clamp(position.z, 0, Map.width*width_clamp_modifier)
+	position.x = clamp(position.x, 0, Map.length*sqrt(3)/2+(sqrt(3)/4))
+	position.z = clamp(position.z, 0, Map.width*0.75+0.5)
 	
 	x = 0
 	y = 0

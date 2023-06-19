@@ -1,6 +1,5 @@
 extends Node3D
 
-var seed
 #@onready var terrain_renderer = $Terrain
 @onready var minimap = $GUI/Minimap
 @onready var camera = $Camera
@@ -26,8 +25,7 @@ var minimap_size : Vector2
 
 var terrain_texture : ImageTexture
 
-const hexagon_width = sqrt(3)
-const hexagon_half_width = sqrt(3)/2
+const HEXAGON_WIDTH = sqrt(3)/2
 
 var sand_color = Color(1, 0.870588, 0.501961, 1)
 
@@ -43,27 +41,9 @@ func init(size : Vector2i, _save : String):
 	Queue.clear_queue()
 	Map.clear(size)
 	if _save.is_empty():
-		generate_world(size,seed)
+		generate_world(size,randi())
 	else:
 		open(_save)
-
-func _init():
-	seed = randi()
-	
-	#var speed : float
-	#var attack : float = 100
-	#var defense : float = 50
-	#var equipment : float = 5000
-	#var manpower : float = 5000
-	#var max_strength : float = (equipment + manpower) / 2
-	#var actual_strength : float = max_strength 
-	#var morale : float
-	#var defense_mod : float
-	#var unit : Array = [attack, defense, speed, max_strength, actual_strength, morale, equipment, manpower, defense_mod] #simple mock division with all necessary stats
-	#unitFightingEqual(unit)
-	#var unitA = [100, 50, 10, 1, 1, 1, 5000, 5000, null]
-	#var unitB = [50, 25, 20, 1, 1, 1, 2500, 2500, null]
-	#division.combat(unitA, unitB
 
 func _unhandled_input(event):
 	if event is InputEventKey:
@@ -120,12 +100,9 @@ func on_map_loaded():
 	
 	connect("tile_selected", Callable(self, "inspector_update"))
 	pick_starting_city_prompt()
-	get_tile_world_pos(Vector2(0,0))
 
 func on_tile_map_update(coordinates : Vector2i):
-	#generate_terrain_map()
-	#update_terrain_map()
-	pass
+	set_color(coordinates, get_tile_color(coordinates))
 
 #func on_generate_map_texture():
 	#terrain_renderer.texture = terrain_texture
@@ -143,7 +120,7 @@ func open(open_path : String) -> void:
 	Map.length = image.get_width()
 	Map.width = image.get_height()
 	
-	var tile_map : Array
+	var tile_map : Array = []
 	utils.initate_2d_array(tile_map, Map.length, Map.width)
 	
 	for x in Map.length:
@@ -170,7 +147,7 @@ func save(save_path : String) -> void:
 	
 	for x in Map.length:
 		for y in Map.width:
-			var color : Color
+			var color : Color = Color()
 			#tile type
 			color.r8 = Map.tile_map[x][y].terrain_type
 			#building type
@@ -199,20 +176,20 @@ func generate_world(size : Vector2i , _seed : int):
 	var river_map_noise = FastNoiseLite.new()
 	
 	moisture_map_noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
-	height_map_noise.seed = randi()
+	height_map_noise.seed = _seed
 	height_map_noise.frequency = 0.0075
 	height_map_noise.fractal_type = FastNoiseLite.FRACTAL_FBM
 	
 	moisture_map_noise.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
-	moisture_map_noise.seed = randi()
+	moisture_map_noise.seed = _seed+1
 	moisture_map_noise.frequency = 0.0075
 	
 	temperature_map_noise.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
-	temperature_map_noise.seed = randi()
+	temperature_map_noise.seed = _seed+2
 	temperature_map_noise.frequency = 0.0075
 	
 	river_map_noise.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
-	river_map_noise.seed = randi()
+	river_map_noise.seed = _seed+3
 	river_map_noise.frequency = 0.01
 	river_map_noise.fractal_type = FastNoiseLite.FRACTAL_RIDGED
 	river_map_noise.fractal_lacunarity = 0
@@ -254,7 +231,7 @@ func generate_world(size : Vector2i , _seed : int):
 			if river_image.get_pixel(x,y).r >= river_moisture_cutoff:
 				moisture_image.set_pixel(x,y, Color(moisture_image.get_pixel(x,y).r+river_moisture_addition, moisture_image.get_pixel(x,y).g+river_moisture_addition, moisture_image.get_pixel(x,y).b+river_moisture_addition))
 	
-	var tile_map : Array
+	var tile_map : Array = []
 	utils.initate_2d_array(tile_map, size.x, size.y)
 	
 	for x in size.x:
@@ -356,9 +333,7 @@ func setup_multimesh_mesh():
 	$"Terrain MultiMesh".multimesh.mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, mesh_data)
 
 func generate_terrain_map() -> void:
-	$"Terrain MultiMesh".multimesh.instance_count = Map.length * Map.width 
-	#fcd062 fcbe49
-	var sand_color = Color("fcbe49")
+	$"Terrain MultiMesh".multimesh.instance_count = Map.length * Map.width
 	
 	var id : int = 0
 	for x in Map.length:
@@ -366,18 +341,15 @@ func generate_terrain_map() -> void:
 			
 			var x_offset : float = 0
 			if (z % 2) == 1:
-				x_offset = hexagon_half_width/2
+				x_offset = HEXAGON_WIDTH/2
 			
-			var instance_transform : Vector3 = Vector3(x*(sqrt(3)/2)-(x_offset)+(sqrt(3)/2),0,-z*(3.0/4.0)-0.5)
+			var instance_transform : Vector3 = Vector3(x*HEXAGON_WIDTH-(x_offset)+HEXAGON_WIDTH,0,-z*(3.0/4.0)-0.5)
 			
 			$"Terrain MultiMesh".multimesh.set_instance_transform(id, Transform3D(Basis(), Vector3(instance_transform)))
-			#$"Terrain MultiMesh".multimesh.set_instance_color(id, color)
 			$"Terrain MultiMesh".multimesh.set_instance_color(id, get_tile_color(Vector2i(x,z)))
 			id+=1
 	
 	var image : Image = Image.create(Map.length, Map.width, false, Image.FORMAT_RGBA8)
-	
-	#var sand_color = Color(1, 0.870588, 0.501961, 1)
 	
 	for x in Map.length:
 		for y in Map.width:
@@ -454,31 +426,11 @@ func minimap_input_event(_a, event, _c):
 			minimap_drag = false
 
 func world_collision_setup():
-	#var num = 0
-	#for x in Map.length:
-	#	for y in Map.width:
-	#		
-	#		var y_offset : float = 0
-	#		if (x % 2) == 0:
-	#			y_offset = sqrt(3)/2
-	#		
-	#		var _tile = preload("res://World/tile.tscn").instantiate()
-	#		_tile.position = Vector3((x*(2*(3.0/4.0))),0,-((y*hexagon_width)-(y_offset)))
-	#		_tile.init(Vector2i(x,y))
-	#		$"World Collision".add_child(_tile)
-	#		_tile.connect("input_event", Callable($"World Collision", "on_input_event"))
-	#		print(num)
-	#		num+=1
-	
-	#print(Map.terrain_types.keys()[Map.tile_map[0][0].terrain_type])
-	
-	#print("length: ", map.length, " width: ", map.width)
-	var collision_shape : Vector3 = Vector3((Map.length*0.75)+sqrt(3)/7, 0, (Map.width*sqrt(3)/2)+hexagon_half_width/2)
+	var collision_shape : Vector3 = Vector3(Map.length*HEXAGON_WIDTH+HEXAGON_WIDTH/2, 0, (Map.width*0.75)+0.25)
 	var collision_position : Vector3 = Vector3((collision_shape.x/2), 0.001, (collision_shape.z/2))
-	print(collision_position)
 	
-	#$"Map Input Events/MeshInstance3D".position = collision_position
-	#$"Map Input Events/CollisionShape3D".position = collision_position
+	$"Map Input Events/MeshInstance3D".position = collision_position
+	$"Map Input Events/CollisionShape3D".position = collision_position
 	
 	$"Map Input Events/CollisionShape3D".shape.size = collision_shape
 	$"Map Input Events/MeshInstance3D".mesh.size = collision_shape
@@ -488,76 +440,86 @@ var prev_input_pos : Vector2i
 func world_input_event(_a, event, _position, _d, _e):
 	if event is InputEventMouseButton:
 		if event.is_action_released("left_click"):
-			print("_position ",_position)
 			var transformed = transform_input_position(_position)
-			print("transformed ", transformed)
-			if _position.x > 0 and _position.z > 0:
+			if transformed.x >= 0 and transformed.x <= Map.length-1 and transformed.y >= 0 and transformed.y <= Map.width-1:
 				if prev_input_pos != null:
 					set_color(prev_input_pos, get_tile_color(prev_input_pos))
-				set_color(Vector2i(transformed.x, transformed.z), "ed2e21")
-				prev_input_pos = Vector2i(transformed.x, transformed.z)
+				set_color(Vector2i(transformed.x, transformed.y), "ed2e21")
+				prev_input_pos = Vector2i(transformed.x, transformed.y)
+				inspector_update(transformed)
 
-# Code adapted from https://www.youtube.com/watch?v=0nXmuJuWS8I
-func transform_input_position(pos : Vector3) -> Vector3:
+func transform_input_position(pos : Vector3) -> Vector2:
 	
-	var original = pos
+	var finalPos : Vector2
 	
-	pos.x-=sqrt(3)/2
-	pos.x/=sqrt(3)/2
-	pos.x+=0.5
+	var translated_pos : Vector2 = Vector2(pos.x, pos.z)
 	
-	pos.z/=0.75
+	translated_pos.x-=HEXAGON_WIDTH
+	translated_pos.x/=HEXAGON_WIDTH
+	translated_pos.x+=0.5
+	
+	translated_pos.y/=0.75
 	
 	var oddRow : bool = false
-	if int(pos.z) % 2 == 1:
+	if int(translated_pos.y) % 2 == 1:
 		oddRow = true
-		#print("odd")
-		pos.x += 0.5
+		translated_pos.x += 0.5
 	
-	print("translated pos: ",pos)
+	var roughY = int(translated_pos.y)
+	var roughX = int(translated_pos.x)
 	
-	var roughZ = int(pos.z)
-	var roughX = int(pos.x)
+	var roughPos = Vector2(roughX, roughY)
 	
-	print("Rough x: ",roughX, " z: ", roughZ)
+	var rough_world_pos = get_tile_world_pos(Vector2i(roughX, roughY))
 	
-	var roughPos = Vector3i(roughX, 0, roughZ)
+	finalPos = roughPos
 	
-	var neighbors : Array = [
-		Vector3i(roughPos+Vector3i(-1,0,+0)),
-		Vector3i(roughPos+Vector3i(+1,0,+0)),
-		
-		Vector3i(roughPos+Vector3i(+0,0,+1)),
-		Vector3i(roughPos+Vector3i(+0,0,-1))
-	]
+	# solve upper triangle cases
 	
-	if oddRow:
-		neighbors.append(Vector3i(roughPos+Vector3i(+1,0,+1)))
-		neighbors.append(Vector3i(roughPos+Vector3i(+1,0,-1)))
-	else:
-		neighbors.append(Vector3i(roughPos+Vector3i(-1,0,+1)))
-		neighbors.append(Vector3i(roughPos+Vector3i(-1,0,-1)))
+	#upper most point on the upper triangle in relation to the center of the hexagon
+	var A = Vector2(rough_world_pos.x,rough_world_pos.y-0.5)
+	#left most point on the upper triangle in relation to the center of the hexagon
+	var B = Vector2(rough_world_pos.x-HEXAGON_WIDTH/2,rough_world_pos.y-0.25)
+	#right most point on the upper triangle in relation to the center of the hexagon
+	var C = Vector2(rough_world_pos.x+HEXAGON_WIDTH/2,rough_world_pos.y-0.25)
 	
-	var closestPos : Vector3 = pos
+	if pos.z < B.y:
+		if !point_in_triangle(A,B,C,Vector2(pos.x,pos.z)):
+			if pos.x < rough_world_pos.x:
+				if oddRow:
+					finalPos = Vector2(roughPos+Vector2(-1,-1))
+				else:
+					finalPos = Vector2(roughPos+Vector2(0,-1))
+			else:
+				if oddRow:
+					finalPos = Vector2(roughPos+Vector2(0,-1))
+				else:
+					finalPos = Vector2(roughPos+Vector2(1,-1))
 	
-	for neighbor in neighbors:
-		print("pos: ", pos)
-		print(neighbor, " tile location: ",get_tile_world_pos(Vector2i(neighbor.x, neighbor.z)))
-		print(pos.distance_to(get_tile_world_pos(Vector2i(neighbor.x, neighbor.z))))
-		print(pos.distance_to(get_tile_world_pos(Vector2i(closestPos.x, closestPos.z))))
-		if pos.distance_to(get_tile_world_pos(Vector2i(neighbor.x, neighbor.z))) < pos.distance_to(get_tile_world_pos(Vector2i(closestPos.x, closestPos.z))):
-			closestPos = neighbor
-			print(closestPos)
-	
-	return closestPos
+	return finalPos
 
-func get_tile_world_pos(pos : Vector2i) -> Vector3:
+func point_in_triangle(A : Vector2, B : Vector2, C : Vector2, P : Vector2) -> bool:
+	#
+	# Massive credit to this video youtu.be/HYAgJN3x4GA?list=PLFt_AvWsXl0cD2LPxcjxVjWTQLxJqKpgZ
+	#
+	
+	var s1 : float = C.y - A.y
+	var s2 : float = C.x - A.x
+	var s3 : float = B.y - A.y
+	var s4 : float = P.y - A.y
+	
+	var w1 : float = (A.x * s1 + s4 * s2 - P.x * s1) / (s3 * s2 - (B.x-A.x) * s1)
+	var w2 : float = (s4- w1 * s3) / s1
+	
+	return w1 >= 0 and w2 >= 0 and (w1 + w2) <= 1
+
+func get_tile_world_pos(pos : Vector2) -> Vector2:
 	
 	var x_offset : float = 0
-	if (pos.y % 2) == 1:
-		x_offset = hexagon_half_width/2
+	if (int(pos.y) % 2) == 1:
+		x_offset = HEXAGON_WIDTH/2
 	
-	return Vector3((pos.x*sqrt(3)/2)-(x_offset)+(sqrt(3)/2),0,-pos.y*(3.0/4.0)-0.5)
+	return Vector2((pos.x*sqrt(3)/2)-(x_offset)+(sqrt(3)/2), pos.y*(3.0/4.0)+0.5)
 
 func inspector_update(_position : Vector2i):
 	var info = $"GUI/location Inspector/info"
