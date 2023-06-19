@@ -11,7 +11,16 @@ var is_dragging = false
 signal area_selected
 signal start_moving_selection
 
+<<<<<<< HEAD
 func _process(_delta):
+=======
+@onready var box = get_node("selection_box")
+
+func _ready():
+	connect("area_selected", Callable(get_parent(), "_on_area_selected"))
+
+func _process(delta):
+>>>>>>> edcbcc90fd869667b8a34466dcea8b33196528cc
 	if Input.is_action_just_pressed("left_click"): #when the user clicks left mouse the vector begins
 		start = mouse_position_global
 		start_vector = mouse_position
@@ -28,7 +37,7 @@ func _process(_delta):
 			end_vector = mouse_position
 			is_dragging = false
 			draw_area(false)
-			emit_signal("area_selected")
+			emit_signal("area_selected", self)
 		else:
 			end = start
 			is_dragging = false
@@ -41,8 +50,16 @@ func _input(event):
 
 func draw_area(draw=true): #draws a rectangle based on the vector the user drags
 	get_node("Panel").size = Vector2(abs(start_vector.x - end_vector.x), abs(start_vector.y - end_vector.y))
+<<<<<<< HEAD
 	var _position = Vector2()
 	_position.x = min(start_vector.x, end_vector.x)
 	_position.y = min(start_vector.y, end_vector.y)
 	get_node("Panel").position = _position
 	get_node("Panel").size *= int(draw)
+=======
+	var position = Vector2()
+	position.x = min(start_vector.x, end_vector.x)
+	position.y = min(start_vector.y, end_vector.y)
+	box.position = position
+	box.size *= int(draw)
+>>>>>>> edcbcc90fd869667b8a34466dcea8b33196528cc
