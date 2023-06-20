@@ -446,7 +446,7 @@ func world_input_event(_a, event, _position, _d, _e):
 					set_color(prev_input_pos, get_tile_color(prev_input_pos))
 				set_color(Vector2i(transformed.x, transformed.y), "ed2e21")
 				prev_input_pos = Vector2i(transformed.x, transformed.y)
-				inspector_update(transformed)
+				emit_signal("tile_selected", transformed)
 
 func transform_input_position(pos : Vector3) -> Vector2:
 	

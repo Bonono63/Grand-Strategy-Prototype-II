@@ -165,7 +165,7 @@ text = "M"
 [node name="Camera2D" type="Camera2D" parent="GUI"]
 script = ExtResource("5_kit5i")
 
-[node name="Panel" type="Panel" parent="GUI/Camera2D"]
+[node name="selection_box" type="Panel" parent="GUI/Camera2D"]
 offset_right = 40.0
 offset_bottom = 40.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_p5kmh")
