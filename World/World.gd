@@ -96,13 +96,23 @@ func on_map_loaded():
 	generate_terrain_map()
 	world_collision_setup()
 	
-	Map.connect("tile_map_change", Callable(self, "on_tile_map_update"))
+	Map.connect("terrain_map_change", Callable(self, "on_terrain_map_update"))
+	Map.connect("building_map_change", Callable(self, "on_building_map_update"))
+	Map.connect("territory_map_change", Callable(self, "on_territory_map_update"))
 	
 	connect("tile_selected", Callable(self, "inspector_update"))
 	pick_starting_city_prompt()
 
-func on_tile_map_update(coordinates : Vector2i):
+func on_terrain_map_update(coordinates : Vector2i):
 	set_color(coordinates, get_tile_color(coordinates))
+
+func on_building_map_update(coordinates : Vector2i):
+	
+	pass
+
+func on_territory_map_update(coordinates : Vector2i):
+	
+	pass
 
 #func on_generate_map_texture():
 	#terrain_renderer.texture = terrain_texture
@@ -427,7 +437,7 @@ func minimap_input_event(_a, event, _c):
 
 func world_collision_setup():
 	var collision_shape : Vector3 = Vector3(Map.length*HEXAGON_WIDTH+HEXAGON_WIDTH/2, 0, (Map.width*0.75)+0.25)
-	var collision_position : Vector3 = Vector3((collision_shape.x/2), 0.001, (collision_shape.z/2))
+	var collision_position : Vector3 = Vector3((collision_shape.x/2), 0, (collision_shape.z/2))
 	
 	$"Map Input Events/MeshInstance3D".position = collision_position
 	$"Map Input Events/CollisionShape3D".position = collision_position
