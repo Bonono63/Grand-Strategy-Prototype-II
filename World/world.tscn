@@ -1,6 +1,7 @@
-[gd_scene load_steps=16 format=3 uid="uid://cr2mhoqo7014t"]
+[gd_scene load_steps=17 format=3 uid="uid://cr2mhoqo7014t"]
 
 [ext_resource type="Script" path="res://World/World.gd" id="1_wrylp"]
+[ext_resource type="Shader" path="res://World/terrain.gdshader" id="2_cyndq"]
 [ext_resource type="PackedScene" uid="uid://daono88iy1yu0" path="res://World/camera.tscn" id="2_rj17n"]
 [ext_resource type="Script" path="res://UI/minimap_collision.gd" id="4_pjcvx"]
 [ext_resource type="Script" path="res://selection.gd" id="5_kit5i"]
@@ -16,10 +17,10 @@ albedo_color = Color(0, 1, 1, 0.301961)
 material = SubResource("StandardMaterial3D_du2w6")
 size = Vector3(1, 0, 1)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cu2ct"]
-vertex_color_use_as_albedo = true
-vertex_color_is_srgb = true
-grow_amount = -0.78
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gbxbe"]
+render_priority = 0
+shader = ExtResource("2_cyndq")
+shader_parameter/enabled = 1.0
 
 [sub_resource type="MultiMesh" id="MultiMesh_3cdo6"]
 transform_format = 1
@@ -36,10 +37,16 @@ ground_curve = 0.011892
 sky_material = SubResource("ProceduralSkyMaterial_2v4oq")
 
 [sub_resource type="Environment" id="Environment_gpl8t"]
-background_mode = 2
+background_mode = 1
+background_color = Color(0.0235294, 0, 0.168627, 1)
 sky = SubResource("Sky_73237")
-ssao_enabled = true
-sdfgi_enabled = true
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 0.784314, 1)
+tonemap_mode = 2
+glow_normalized = true
+glow_blend_mode = 0
+adjustment_brightness = 0.95
+adjustment_contrast = 1.15
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_2vory"]
 
@@ -59,6 +66,8 @@ corner_radius_bottom_left = 2
 [node name="World" type="Node3D"]
 script = ExtResource("1_wrylp")
 
+[node name="Building Layer" type="Node3D" parent="."]
+
 [node name="Map Input Events" type="Area3D" parent="."]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Map Input Events"]
@@ -71,7 +80,7 @@ mesh = SubResource("BoxMesh_0a72t")
 
 [node name="Terrain MultiMesh" type="MultiMeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, -1, 8.74228e-08, 0, -8.74228e-08, -1, 0, 0, 0)
-material_override = SubResource("StandardMaterial3D_cu2ct")
+material_override = SubResource("ShaderMaterial_gbxbe")
 multimesh = SubResource("MultiMesh_3cdo6")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
@@ -96,18 +105,10 @@ color = Color(0.136826, 0.136826, 0.136826, 1)
 
 [node name="TextureRect" type="TextureRect" parent="GUI/Minimap"]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
-grow_horizontal = 2
-grow_vertical = 2
-flip_v = true
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 42.0
+offset_bottom = 42.0
 
 [node name="camera_outline" type="ColorRect" parent="GUI/Minimap"]
 material = SubResource("CanvasItemMaterial_2vory")
@@ -148,19 +149,6 @@ layout_mode = 0
 offset_right = 40.0
 offset_bottom = 23.0
 text = "info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info v"
-
-[node name="minimap_toggle" type="Button" parent="GUI"]
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -23.0
-offset_top = -31.0
-grow_horizontal = 0
-grow_vertical = 0
-focus_mode = 0
-text = "M"
 
 [node name="Camera2D" type="Camera2D" parent="GUI"]
 script = ExtResource("5_kit5i")

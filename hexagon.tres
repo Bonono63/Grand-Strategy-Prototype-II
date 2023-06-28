@@ -1,0 +1,20 @@
+[gd_resource type="ArrayMesh" load_steps=3 format=3 uid="uid://b2ao7bgeopy3q"]
+
+[ext_resource type="Texture2D" uid="uid://c1lke5a3eqbyt" path="res://tile.png" id="1_qsfeg"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7fr72"]
+albedo_color = Color(0.509804, 0.0666667, 0.356863, 1)
+albedo_texture = ExtResource("1_qsfeg")
+
+[resource]
+_surfaces = [{
+"aabb": AABB(-0.433013, 0, -0.5, 0.866025, 1e-05, 1),
+"attribute_data": PackedByteArray(0, 0, 0, 63, 0, 0, 0, 63, 215, 179, 221, 62, 0, 0, 0, 0, 215, 179, 93, 63, 0, 0, 128, 62, 215, 179, 93, 63, 0, 0, 64, 63, 215, 179, 221, 62, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 64, 63, 0, 0, 0, 0, 0, 0, 128, 62),
+"format": 4113,
+"index_count": 18,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0, 0, 0, 2, 0, 3, 0, 0, 0, 3, 0, 4, 0, 0, 0, 4, 0, 5, 0, 0, 0, 5, 0, 6, 0, 0, 0, 6, 0, 1, 0),
+"material": SubResource("StandardMaterial3D_7fr72"),
+"primitive": 3,
+"vertex_count": 7,
+"vertex_data": PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 63, 215, 179, 221, 62, 0, 0, 0, 0, 0, 0, 128, 62, 215, 179, 221, 62, 0, 0, 0, 0, 0, 0, 128, 190, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 191, 215, 179, 221, 190, 0, 0, 0, 0, 0, 0, 128, 190, 215, 179, 221, 190, 0, 0, 0, 0, 0, 0, 128, 62)
+}]

@@ -33,7 +33,7 @@ func _process(delta):
 			end_vector = mouse_position
 			is_dragging = false
 			draw_area(false)
-			emit_signal("area_selected", self)
+			#emit_signal("area_selected", self)
 		else:
 			end = start
 			is_dragging = false

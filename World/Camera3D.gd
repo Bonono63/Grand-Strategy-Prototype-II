@@ -10,7 +10,7 @@ const rotation_control_enabled = false
 @export var zoom_speed = 0.09
 @export var mouse_sensitivity = 0.05
 
-var zoom = default_zoom
+var zoom : float = default_zoom
 
 var x = 0 
 var y = 0
@@ -33,7 +33,7 @@ func _unhandled_input(event):
 	if event is InputEventMouse:
 		if event is InputEventMouseMotion:
 			if event.relative.x != 0:
-				x = -event.relative.x
+				x = event.relative.x
 			if event.relative.y != 0:
 				y = event.relative.y
 		if event is InputEventMouseButton:
@@ -73,10 +73,13 @@ var prev_zoom = 0.5
 var old_pos : Vector3
 var old_rotation : Vector3
 
+var x_offset = 0
+
 func _process(_delta):
 	if position_control:
-		translate_object_local(Vector3(x*mouse_sensitivity*(position.y/45),y*mouse_sensitivity*(position.y/45),0))
+		position -= Vector3(x*mouse_sensitivity*(position.y/45),0,y*mouse_sensitivity*(position.y/45))
 	
+	# when rotation control is enabled, this allows for it
 	if rotation_control && shift > 1 && rotation_control_enabled:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		_rotation_y = (x*mouse_sensitivity)
@@ -84,6 +87,7 @@ func _process(_delta):
 	else:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	
+	# keyboard control of the camera
 	if (forward):
 		translate_object_local(Vector3(0, keyboard_sensitivity*shift*(position.y/45), 0))
 	if (backward):
@@ -93,14 +97,16 @@ func _process(_delta):
 	if (right):
 		translate_object_local(Vector3(keyboard_sensitivity*shift*(position.y/45), 0, 0))
 	
-	position.y = zoom
+	# smoothen zoom and clamp it
+	position.y = lerp(prev_zoom, zoom, zoom_speed)
 	position.y = clamp(position.y, min_zoom, max_zoom)
 	
-	#position.x = clamp(position.x, 0,)
-	position.x = clamp(position.x, 0, Map.length*sqrt(3)/2+(sqrt(3)/4))
-	position.z = clamp(position.z, 0, Map.width*0.75+0.5)
+	# Stop the camera from going out of bounds
+	position.x = clamp(position.x, 0, Map.size.x*sqrt(3)/2+(sqrt(3)/4))
+	position.z = clamp(position.z, 0, Map.size.y*0.75+0.5)
 	
 	x = 0
 	y = 0
+	
 	_rotation_y = 0
 	prev_zoom = zoom

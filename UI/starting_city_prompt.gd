@@ -10,7 +10,7 @@ func _ready():
 	confirm_button.connect("button_down", Callable(self, "confirmed"))
 
 func on_tile_select(_pos):
-	if Map.tile_map[_pos.x][_pos.y].terrain_type != Map.terrain_types.ocean and Map.tile_map[_pos.x][_pos.y].terrain_type != Map.terrain_types.swamp and Map.tile_map[_pos.x][_pos.y].terrain_type != Map.terrain_types.shallow_water:
+	if Map.tile_map[_pos.x][_pos.y].terrain_type != tile.terrain_types.ocean and Map.tile_map[_pos.x][_pos.y].terrain_type != tile.terrain_types.swamp and Map.tile_map[_pos.x][_pos.y].terrain_type != tile.terrain_types.shallow_water:
 		selected_tile = _pos
 		$Label.text = str("Select Your Starting location ", selected_tile)
 	else:
@@ -21,5 +21,6 @@ func invalid_selection():
 	$Label.text = "Invalid Selection"
 
 func confirmed():
-	Queue.add_command(Queue.types.construct_building, [selected_tile.x, selected_tile.y, Map.building_types.city_center])
+	Queue.add_command(Queue.types.construct_building, [selected_tile.x, selected_tile.y, tile.building_types.city_center])
+	get_parent().get_parent().emit_signal("setup_finished")
 	self.queue_free()
