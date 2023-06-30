@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://cja52cxnqu6lc"]
+[gd_scene load_steps=2 format=3 uid="uid://cja52cxnqu6lc"]
+
+[ext_resource type="Script" path="res://UI/lobby_prompt.gd" id="1_auef6"]
 
 [node name="Lobby Prompt" type="Control"]
 layout_mode = 3
@@ -7,14 +9,71 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_auef6")
 
 [node name="Panel" type="Panel" parent="."]
-layout_mode = 0
-offset_right = 400.0
-offset_bottom = 200.0
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -100.0
+offset_right = 200.0
+offset_bottom = 195.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="Label" type="Label" parent="."]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
-text = "Lobby"
+[node name="Label" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -56.0
+offset_top = 12.0
+offset_right = 57.0
+offset_bottom = 38.0
+grow_horizontal = 2
+text = "Country Select"
+
+[node name="New Country" type="Button" parent="Panel"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -43.0
+offset_right = 63.0
+offset_bottom = -12.0
+grow_vertical = 0
+text = "New"
+
+[node name="Play as Selected" type="Button" parent="Panel"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -151.0
+offset_top = -43.0
+offset_right = -20.0
+offset_bottom = -12.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Play Selected"
+
+[node name="ItemList" type="ItemList" parent="Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -175.0
+offset_top = -100.0
+offset_right = 175.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2

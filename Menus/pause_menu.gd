@@ -8,9 +8,7 @@ extends CanvasLayer
 func _ready():
 	save_button.connect("button_down", Callable(self, "save_button_pressed"))
 	settings_button.connect("button_down", Callable(self, "settings_button_pressed"))
-	#exit_button.connect("button_down", Callable(self, "exit_button_pressed"))
 	return_button.connect("button_down", Callable(self, "return_button_pressed"))
-	
 
 func save_button_pressed():
 	var save_menu = preload("res://Menus/save_menu.tscn").instantiate()

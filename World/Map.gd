@@ -6,6 +6,7 @@ signal map_loaded
 signal terrain_map_change
 signal building_map_change
 signal territory_map_change
+signal country_created
 
 var size : Vector2i
 
@@ -41,3 +42,13 @@ func set_territory(x : int, y : int, country_value : int):
 		emit_signal("territory_map_change", Vector2i(x,y))
 	else:
 		print("territory arguments where out of range")
+
+func create_country(id : int, color : Color, display_name : String):
+	var new_country = Country.new()
+	
+	new_country.id = id
+	new_country.color = color
+	new_country.Display_Name = display_name
+	countries.append(new_country)
+	print("country created ", display_name, " id: ", id)
+	emit_signal("country_created")
