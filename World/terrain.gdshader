@@ -26,7 +26,7 @@ vec3 srgb_albedo(vec3 color)
 void fragment() {
 	float HEXAGON_WIDTH = sqrt(3.0)/2.0;
 	
-	float border_size = 0.005;
+	float border_size = 0.025;
 	
 	// Outter hexagon
 	vec2 OUTER_TOP = vec2(HEXAGON_WIDTH/2.0,0.0);

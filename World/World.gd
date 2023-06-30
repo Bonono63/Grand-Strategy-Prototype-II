@@ -1,11 +1,11 @@
 extends Node3D
 
+### Stores and operates all World data and functions
+### Essentially the main loop of the game
+
 @onready var minimap = $GUI/Minimap
 @onready var camera = $Camera
 @onready var inspector = $"GUI/location Inspector"
-var minimap_drag = false
-var drag : Vector2
-var minimap_size : Vector2
 
 @export_range(0,1) var sea_level = .4
 @export_range(0,1) var coast_height = .475
@@ -22,11 +22,15 @@ var minimap_size : Vector2
 @export_range(0,1) var river_cutoff = .955
 @export_range(0,1) var river_moisture_addition = 0.25
 
-var terrain_texture : ImageTexture
-
 const HEXAGON_WIDTH = sqrt(3)/2
 
 var sand_color = Color(1, 0.870588, 0.501961, 1)
+
+var terrain_texture : ImageTexture
+
+var minimap_drag = false
+var drag : Vector2
+var minimap_size : Vector2
 
 var pause : bool
 
@@ -97,8 +101,12 @@ func on_map_loaded():
 	
 	connect("setup_finished", Callable(self, "on_set_up_finished"))
 	
+	### decide whether to ask for a new country or to select a country
 	
 	
+	
+	# Center the camera in the world
+	set_camera_position(Vector2((Map.size.x*HEXAGON_WIDTH)/2, (Map.size.y*0.75)/2))
 	pick_starting_city_prompt()
 
 func on_terrain_map_update(coordinates : Vector2i):
@@ -121,9 +129,6 @@ func on_building_map_update(pos : Vector2i):
 func on_territory_map_update(coordinates : Vector2i):
 	
 	pass
-
-#func on_generate_map_texture():
-	#terrain_renderer.texture = terrain_texture
 
 func _process(_delta):
 	update_minimap()
@@ -599,3 +604,6 @@ func update_camera_outline() -> void:
 	if (minimap_drag):
 		print(drag)
 		camera.position = Vector3((drag.x-Map.size.x)*HEXAGON_WIDTH, camera.position.y, drag.y*0.75)
+
+func set_camera_position(pos : Vector2):
+	camera.position = Vector3(pos.x, camera.position.y, pos.y)

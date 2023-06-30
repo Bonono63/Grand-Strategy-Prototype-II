@@ -1,0 +1,26 @@
+[gd_scene load_steps=3 format=3 uid="uid://dvwglwx540ukw"]
+
+[ext_resource type="Script" path="res://UI/debug.gd" id="1_0ftii"]
+[ext_resource type="Theme" uid="uid://civ7y1354a4ge" path="res://UI/general.tres" id="2_1ui6f"]
+
+[node name="Debug" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_0ftii")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 0
+offset_right = 70.0
+offset_bottom = 120.0
+mouse_filter = 2
+theme = ExtResource("2_1ui6f")
+
+[node name="FPS" type="Label" parent="Panel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0

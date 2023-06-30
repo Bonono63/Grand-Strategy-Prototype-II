@@ -1,8 +1,8 @@
 extends Node3D
 
-const zoom_increment = 20
-const max_zoom = 1000
-@export var min_zoom = 1
+const zoom_increment = 10
+const max_zoom = 90
+@export var min_zoom = 3
 const default_zoom = 50
 
 const rotation_control_enabled = false

@@ -1,10 +1,11 @@
-[gd_scene load_steps=17 format=3 uid="uid://cr2mhoqo7014t"]
+[gd_scene load_steps=18 format=3 uid="uid://cr2mhoqo7014t"]
 
 [ext_resource type="Script" path="res://World/World.gd" id="1_wrylp"]
 [ext_resource type="Shader" path="res://World/terrain.gdshader" id="2_cyndq"]
 [ext_resource type="PackedScene" uid="uid://daono88iy1yu0" path="res://World/camera.tscn" id="2_rj17n"]
 [ext_resource type="Script" path="res://UI/minimap_collision.gd" id="4_pjcvx"]
 [ext_resource type="Script" path="res://selection.gd" id="5_kit5i"]
+[ext_resource type="PackedScene" uid="uid://dvwglwx540ukw" path="res://UI/debug.tscn" id="6_g4kjj"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_olgbl"]
 size = Vector3(1, 0, 1)
@@ -95,6 +96,30 @@ transform = Transform3D(1, 0, 0, 0, 0.258819, 0.965926, 0, -0.965926, 0.258819, 
 
 [node name="GUI" type="CanvasLayer" parent="."]
 
+[node name="Debug" parent="GUI" instance=ExtResource("6_g4kjj")]
+
+[node name="location Inspector" type="Panel" parent="GUI"]
+visible = false
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -40.0
+offset_right = 40.0
+grow_vertical = 0
+mouse_filter = 1
+
+[node name="coords" type="Label" parent="GUI/location Inspector"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "coords"
+
+[node name="info" type="Label" parent="GUI/location Inspector"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info v"
+
 [node name="Minimap" type="ColorRect" parent="GUI"]
 visible = false
 offset_right = 40.0
@@ -127,28 +152,6 @@ script = ExtResource("4_pjcvx")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GUI/Minimap/Area2D"]
 shape = SubResource("RectangleShape2D_nrk3u")
 debug_color = Color(0, 0.6, 0.701961, 0.45098)
-
-[node name="location Inspector" type="Panel" parent="GUI"]
-visible = false
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_top = -40.0
-offset_right = 40.0
-grow_vertical = 0
-mouse_filter = 1
-
-[node name="coords" type="Label" parent="GUI/location Inspector"]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
-text = "coords"
-
-[node name="info" type="Label" parent="GUI/location Inspector"]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
-text = "info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info v"
 
 [node name="Camera2D" type="Camera2D" parent="GUI"]
 script = ExtResource("5_kit5i")
