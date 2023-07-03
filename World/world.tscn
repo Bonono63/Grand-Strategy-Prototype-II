@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://cr2mhoqo7014t"]
+[gd_scene load_steps=20 format=3 uid="uid://cr2mhoqo7014t"]
 
 [ext_resource type="Script" path="res://World/World.gd" id="1_wrylp"]
 [ext_resource type="Shader" path="res://World/terrain.gdshader" id="2_cyndq"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://UI/minimap_collision.gd" id="4_pjcvx"]
 [ext_resource type="Script" path="res://selection.gd" id="5_kit5i"]
 [ext_resource type="PackedScene" uid="uid://dvwglwx540ukw" path="res://UI/debug.tscn" id="6_g4kjj"]
+[ext_resource type="Shader" path="res://World/vignette.gdshader" id="7_ya128"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_olgbl"]
 size = Vector3(1, 0, 1)
@@ -49,6 +50,12 @@ glow_blend_mode = 0
 adjustment_brightness = 0.95
 adjustment_contrast = 1.15
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ndp8t"]
+shader = ExtResource("7_ya128")
+shader_parameter/vignette_intensity = 0.4
+shader_parameter/vignette_opacity = 0.5
+shader_parameter/vignette_rgb = Color(0, 0, 0, 1)
+
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_2vory"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_nrk3u"]
@@ -65,9 +72,11 @@ corner_radius_bottom_right = 2
 corner_radius_bottom_left = 2
 
 [node name="World" type="Node3D"]
+process_mode = 3
 script = ExtResource("1_wrylp")
 
 [node name="Building Layer" type="Node3D" parent="."]
+process_mode = 3
 
 [node name="Map Input Events" type="Area3D" parent="."]
 
@@ -95,6 +104,17 @@ light_energy = 1.25
 transform = Transform3D(1, 0, 0, 0, 0.258819, 0.965926, 0, -0.965926, 0.258819, 0, 0, 0)
 
 [node name="GUI" type="CanvasLayer" parent="."]
+process_mode = 3
+
+[node name="Vignette" type="ColorRect" parent="GUI"]
+visible = false
+material = SubResource("ShaderMaterial_ndp8t")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 
 [node name="Debug" parent="GUI" instance=ExtResource("6_g4kjj")]
 

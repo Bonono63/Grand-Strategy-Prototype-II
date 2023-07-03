@@ -13,8 +13,8 @@ script = ExtResource("1_wxphv")
 
 [node name="Panel" type="Panel" parent="."]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_right = 300.0
+offset_bottom = 5000.0
 
 [node name="Singleplayer" type="Button" parent="."]
 layout_mode = 0

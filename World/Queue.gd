@@ -17,7 +17,7 @@ func _process(_delta):
 			types.set_terrain:
 				Map.set_terrain(c.arguments["x"], c.arguments["y"], c.arguments["terrain_type"])
 			types.create_country:
-				Map.create_country(c.arguments["id"], c.arguments["color"], c.arguments["display_name"])
+				Map.create_country(c.arguments["color"], c.arguments["display_name"])
 		commands.erase(c)
 
 func add_command(type : int, arguments : Dictionary):

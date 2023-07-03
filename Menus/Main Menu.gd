@@ -17,7 +17,7 @@ func _ready():
 func resolution_change():
 	var aspect_ratio = Vector2(get_viewport().get_size().x, get_viewport().get_size().y).normalized()
 	$Panel.position = Vector2(0,0)
-	$Panel.size = Vector2(aspect_ratio.x*500,aspect_ratio.y*2500)
+	#$Panel.size = Vector2(aspect_ratio.x*500,aspect_ratio.y*2500)
 
 func singleplayer_button_pressed():
 	get_tree().change_scene_to_file("res://Menus/singleplayer_world_select.tscn")

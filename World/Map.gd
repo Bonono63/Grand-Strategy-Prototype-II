@@ -43,12 +43,11 @@ func set_territory(x : int, y : int, country_value : int):
 	else:
 		print("territory arguments where out of range")
 
-func create_country(id : int, color : Color, display_name : String):
+func create_country(color : Color, display_name : String):
 	var new_country = Country.new()
 	
-	new_country.id = id
 	new_country.color = color
 	new_country.Display_Name = display_name
 	countries.append(new_country)
-	print("country created ", display_name, " id: ", id)
+	print("country created ", display_name, " id: ", countries.size())
 	emit_signal("country_created")

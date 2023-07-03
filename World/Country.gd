@@ -5,5 +5,4 @@ extends Node
 
 var color : Color
 var Display_Name : String
-var id : int
 var flag : ImageTexture

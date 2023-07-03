@@ -16,7 +16,7 @@ script = ExtResource("1_0ftii")
 [node name="Panel" type="Panel" parent="."]
 layout_mode = 0
 offset_right = 70.0
-offset_bottom = 120.0
+offset_bottom = 29.0
 mouse_filter = 2
 theme = ExtResource("2_1ui6f")
 

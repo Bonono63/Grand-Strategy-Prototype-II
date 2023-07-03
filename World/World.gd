@@ -90,7 +90,6 @@ func _ready():
 
 func on_map_loaded():
 	print("map loaded")
-	$"Map Input Events".connect("input_event", world_input_event)
 	setup_multimesh_mesh()
 	generate_terrain_map()
 	world_collision_setup()
@@ -100,14 +99,24 @@ func on_map_loaded():
 	Map.connect("territory_map_change", Callable(self, "on_territory_map_update"))
 	
 	connect("setup_finished", Callable(self, "on_set_up_finished"))
+	$"Map Input Events".connect("input_event", world_input_event)
 	
 	### decide whether to ask for a new country or to select a country
 	
+	Map.create_country(Color("473300"), "Imperial Germany")
+	Map.create_country(Color("080084"), "Great Britain")
 	
+	if !Map.countries.is_empty():
+		open_lobby_prompt()
+	else:
+		pick_starting_city_prompt()
+	
+	#for x in 6:
+	#	for y in 6:
+	#		Map.set_territory(x,y,1)
 	
 	# Center the camera in the world
 	set_camera_position(Vector2((Map.size.x*HEXAGON_WIDTH)/2, (Map.size.y*0.75)/2))
-	pick_starting_city_prompt()
 
 func on_terrain_map_update(coordinates : Vector2i):
 	set_color(coordinates, get_tile_color(coordinates))
@@ -127,8 +136,7 @@ func on_building_map_update(pos : Vector2i):
 	$"Building Layer".add_child(instance)
 
 func on_territory_map_update(coordinates : Vector2i):
-	
-	pass
+	set_color(coordinates, get_tile_color(coordinates))
 
 func _process(_delta):
 	update_minimap()
@@ -407,27 +415,32 @@ func get_color(coordinates : Vector2i) -> Color:
 	return $"Terrain MultiMesh".multimesh.get_instance_color(id)
 
 func get_tile_color(pos : Vector2i) -> Color:
+	var color : Color
 	match (Map.tile_map[pos.x][pos.y].terrain_type):
 		tile.terrain_types.ocean:
-			return Color("020873") # ocean
+			color = Color("020873") # ocean
 		tile.terrain_types.shallow_water:
-			return Color("449dd1") # coast
+			color = Color("449dd1") # coast
 		tile.terrain_types.shore:
-			return Color(sand_color) # shore
+			color = Color(sand_color) # shore
 		tile.terrain_types.mountain:
-			return Color("585858") # mountain
+			color = Color("585858") # mountain
 		tile.terrain_types.plains:
-			return Color("4daa13") # plains
+			color = Color("4daa13") # plains
 		tile.terrain_types.forest:
-			return Color("226c00") # forest
+			color = Color("226c00") # forest
 		tile.terrain_types.swamp:
-			return Color("854d27") # swamp
+			color = Color("854d27") # swamp
 		tile.terrain_types.desert:
-			return Color(sand_color) # desert
+			color = Color(sand_color) # desert
 		tile.terrain_types.jungle:
-			return Color("053225") # jungle
+			color = Color("053225") # jungle
 		_:
-			return Color.TRANSPARENT # other
+			color = Color.TRANSPARENT # other
+	var controller = Map.tile_map[pos.x][pos.y].controller
+	if controller > 0:
+		color += Map.countries[controller].color
+	return color
 
 ### Interaction with the world
 
@@ -552,6 +565,10 @@ func inspector_update(_position : Vector2i):
 func pick_starting_city_prompt():
 	var starting_city_prompt = preload("res://UI/starting_city_prompt.tscn").instantiate()
 	$GUI.add_child(starting_city_prompt)
+
+func open_lobby_prompt():
+	var lobby_prompt = preload("res://UI/lobby_prompt.tscn").instantiate()
+	$GUI.add_child(lobby_prompt)
 
 func on_set_up_finished():
 	print("world setup finished")

@@ -12,7 +12,7 @@ var year : int
 
 enum speeds { QUARTER, HALF, ONE, TWO, FOUR }
 
-var speed : int = 2
+var speed : int = speeds.ONE
 
 func _ready():
 	await Map.map_loaded
@@ -23,7 +23,7 @@ func _ready():
 
 # counts up game time
 func count_up():
-	print("count up")
+	#print("count up")
 	if day != 30:
 		day +=1
 	else: 
@@ -31,6 +31,7 @@ func count_up():
 			month +=1
 		else:
 			year +=1
+	print("day: ", day, " month: ", month, " year: ", year)
 
 func reset():
 	year = 0
