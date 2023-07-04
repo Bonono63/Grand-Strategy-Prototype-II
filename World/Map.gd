@@ -14,6 +14,8 @@ var tile_map : Array
 
 var countries : Array
 
+var city_centers : Array
+
 # Meant to clear all previously stored tile data when the World is exited ( The Map is otherwise persistant in memory after loading it )
 func clear(_size : Vector2i):
 	size.x = _size.x
@@ -23,14 +25,20 @@ func clear(_size : Vector2i):
 
 func set_terrain(x : int, y : int, value : int):
 	if x <= size.x && y <= size.y:
-		tile_map[x][y].tile_type = value
-		emit_signal("terrain_map_change", Vector2i(x,y))
+		if value <= tile.terrain_types.size():
+			tile_map[x][y].terrain_type = value
+			emit_signal("terrain_map_change", Vector2i(x,y))
 	else:
 		print("terrain arguments where out of range")
 
 func add_building(x : int, y : int, value : int):
 	if x <= size.x && y <= size.y:
 		tile_map[x][y].building = value
+		match value:
+			tile.building_types.city_center:
+				pass
+			_:
+				pass
 		emit_signal("building_map_change", Vector2i(x,y))
 	else:
 		print("building arguments where out of range")
@@ -47,7 +55,10 @@ func create_country(color : Color, display_name : String):
 	var new_country = Country.new()
 	
 	new_country.color = color
-	new_country.Display_Name = display_name
+	new_country.display_name = display_name
 	countries.append(new_country)
 	print("country created ", display_name, " id: ", countries.size())
 	emit_signal("country_created")
+
+func iterate_cities() -> void:
+	pass

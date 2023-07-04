@@ -1,0 +1,27 @@
+[gd_scene load_steps=2 format=3 uid="uid://3gm0vdvdp44d"]
+
+[ext_resource type="Script" path="res://UI/command_prompt.gd" id="1_n4m7g"]
+
+[node name="command_prompt" type="Panel"]
+visible = false
+offset_right = 300.0
+offset_bottom = 300.0
+script = ExtResource("1_n4m7g")
+
+[node name="LineEdit" type="LineEdit" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -31.0
+offset_right = 300.0
+grow_vertical = 0
+focus_mode = 1
+placeholder_text = "prompt"
+context_menu_enabled = false
+virtual_keyboard_enabled = false
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_right = 300.0
+offset_bottom = 268.0

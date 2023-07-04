@@ -16,7 +16,7 @@ signal start_moving_selection
 func _ready():
 	connect("area_selected", Callable(get_parent(), "_on_area_selected"))
 
-func _process(delta):
+func _process(_delta):
 	if Input.is_action_just_pressed("left_click"): #when the user clicks left mouse the vector begins
 		start = mouse_position_global
 		start_vector = mouse_position

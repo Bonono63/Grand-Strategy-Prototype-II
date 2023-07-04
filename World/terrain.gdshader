@@ -1,7 +1,7 @@
 shader_type spatial;
 render_mode unshaded;
 
-uniform float enabled;
+uniform bool enabled;
 
 bool point_in_triangle(vec2 A, vec2 B, vec2 C, vec2 P)
 {
@@ -27,6 +27,8 @@ void fragment() {
 	float HEXAGON_WIDTH = sqrt(3.0)/2.0;
 	
 	float border_size = 0.025;
+	float half_border = border_size/2.0;
+	float edge_offset = 0.5-HEXAGON_WIDTH/2.0;
 	
 	// Outter hexagon
 	vec2 OUTER_TOP = vec2(HEXAGON_WIDTH/2.0,0.0);
@@ -38,13 +40,13 @@ void fragment() {
 	vec2 OUTER_BOTTOM_RIGHT = vec2(HEXAGON_WIDTH,0.75);
 	
 	// Inner hexagon
-	vec2 INNER_TOP = vec2(HEXAGON_WIDTH/2.0,0.0+border_size);
-	vec2 INNER_TOP_LEFT = vec2(0.0+border_size,0.25+border_size);
-	vec2 INNER_TOP_RIGHT = vec2(HEXAGON_WIDTH-border_size,0.25+border_size);
+	vec2 INNER_TOP = vec2(0.5,0.0+border_size);
+	vec2 INNER_TOP_LEFT = vec2(0.0+edge_offset+border_size,0.25+half_border);
+	vec2 INNER_TOP_RIGHT = vec2(1.0-edge_offset-border_size,0.25+half_border);
 	
-	vec2 INNER_BOTTOM = vec2(HEXAGON_WIDTH/2.0,1.0-border_size);
-	vec2 INNER_BOTTOM_LEFT = vec2(0.0+border_size,0.75-border_size);
-	vec2 INNER_BOTTOM_RIGHT = vec2(HEXAGON_WIDTH-border_size,0.75-border_size);
+	vec2 INNER_BOTTOM = vec2(0.5,1.0-border_size);
+	vec2 INNER_BOTTOM_LEFT = vec2(0.0+edge_offset+border_size,0.75-half_border);
+	vec2 INNER_BOTTOM_RIGHT = vec2(1.0-edge_offset-border_size,0.75-half_border);
 	
 	ALBEDO = COLOR.xyz;
 	
@@ -52,19 +54,26 @@ void fragment() {
 	//float edge_fade = smoothstep(1.0, 0.0, distance_to_inner_hexagon);
 	float edge_viscocity = 0.185;
 	
-	if (enabled > 0.0)
-	{
+	if (enabled)
+	{ /*
 		if (!(point_in_triangle(OUTER_TOP,OUTER_TOP_LEFT,OUTER_TOP_RIGHT,UV) || point_in_triangle(OUTER_BOTTOM,OUTER_BOTTOM_LEFT,OUTER_BOTTOM_RIGHT,UV) || point_in_triangle(OUTER_TOP_LEFT,OUTER_TOP_RIGHT,OUTER_BOTTOM_LEFT,UV) || point_in_triangle(OUTER_BOTTOM_LEFT,OUTER_BOTTOM_RIGHT,OUTER_TOP_RIGHT,UV)))
 		{
 			ALBEDO = vec3(COLOR.xyz-edge_viscocity);
-		}
-	
+		}*/
+		
 		if (!(point_in_triangle(INNER_TOP,INNER_TOP_LEFT,INNER_TOP_RIGHT,UV) || point_in_triangle(INNER_BOTTOM,INNER_BOTTOM_LEFT,INNER_BOTTOM_RIGHT,UV) || point_in_triangle(INNER_TOP_LEFT,INNER_TOP_RIGHT,INNER_BOTTOM_LEFT,UV) || point_in_triangle(INNER_BOTTOM_LEFT,INNER_BOTTOM_RIGHT,INNER_TOP_RIGHT,UV)))
 		{
 			ALBEDO = vec3(COLOR.xyz-edge_viscocity);
 		}
+		
+		vec2 center = vec2(UV.x-0.5, UV.y-0.5); 
+		
+		if (!(length(center) > 0.435))
+		{
+			//ALBEDO = vec3(0.0);
+			ALBEDO = COLOR.xyz;
+		}
 	}
-	
 	
 	ALBEDO = srgb_albedo(ALBEDO);
 }

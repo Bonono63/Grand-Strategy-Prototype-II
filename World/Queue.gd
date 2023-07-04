@@ -4,7 +4,7 @@ extends Node
 
 var commands : Array
 
-enum types { construct_building, create_country, update_controller, set_terrain, division_movement }
+enum types { construct_building, create_country, set_territory, set_terrain, division_movement }
 
 func _process(_delta):
 	for c in commands:
@@ -12,8 +12,8 @@ func _process(_delta):
 		match (c.type):
 			types.construct_building:
 				Map.add_building(c.arguments["x"], c.arguments["y"], c.arguments["building_type"])
-			types.update_controller:
-				Map.add_territory(c.arguments["x"], c.arguments["y"], c.arguments["controller_id"])
+			types.set_territory:
+				Map.set_territory(c.arguments["x"], c.arguments["y"], c.arguments["controller_id"])
 			types.set_terrain:
 				Map.set_terrain(c.arguments["x"], c.arguments["y"], c.arguments["terrain_type"])
 			types.create_country:

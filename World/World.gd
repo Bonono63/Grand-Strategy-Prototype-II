@@ -63,6 +63,8 @@ func _unhandled_input(event):
 				remove_child(get_child(-1))
 		if event.is_action_pressed("tab"):
 			emit_signal("toggle_minimap")
+		if event.is_action_pressed("open_prompt"):
+			$GUI/command_prompt.show()
 
 # can be called anywhere to return to the main menu
 func return_to_main_menu():
@@ -111,9 +113,13 @@ func on_map_loaded():
 	else:
 		pick_starting_city_prompt()
 	
-	#for x in 6:
-	#	for y in 6:
-	#		Map.set_territory(x,y,1)
+	for x in 6:
+		for y in 6:
+			Queue.add_command(Queue.types.set_territory, {"x":x, "y":y, "controller_id":1})
+	
+	for x in 6:
+		for y in 6:
+			Queue.add_command(Queue.types.set_territory, {"x":x+6, "y":y+6, "controller_id":2})
 	
 	# Center the camera in the world
 	set_camera_position(Vector2((Map.size.x*HEXAGON_WIDTH)/2, (Map.size.y*0.75)/2))
@@ -361,22 +367,26 @@ func setup_multimesh_mesh():
 		]
 	)
 	
+	# I don't even entirely know why this number works, but it does
+	var edge_offset = 0.5-HEXAGON_WIDTH/2
+	
+	# This took me far too long to get just right, but it is the perfect UV for the hexagon tiles!
 	mesh_data[ArrayMesh.ARRAY_TEX_UV] = PackedVector2Array(
 		[
 			Vector2(0.5,0.5), # 0.0 , 0.0
-			Vector2(sqrt(3)/4,0.0), # 0.0 , 0.5
-			Vector2(sqrt(3)/2,0.25), # sqrt(3)/4 , 0.25
-			Vector2(sqrt(3)/2,0.75), # sqrt(3)/4 , -0.25
-			Vector2(sqrt(3)/4,1.0), # 0.0 , -0.5
-			Vector2(0.0,0.75), # -sqrt(3)/4 , -0.25
-			Vector2(0.0,0.25), # -sqrt(3)/4 , 0.25
+			Vector2(0.5,0.0), # 0.0 , 0.5
+			Vector2(1.0-edge_offset,0.25), # sqrt(3)/4 , 0.25
+			Vector2(1.0-edge_offset,0.75), # sqrt(3)/4 , -0.25
+			Vector2(0.5,1.0), # 0.0 , -0.5
+			Vector2(0.0+edge_offset,0.75), # -sqrt(3)/4 , -0.25
+			Vector2(0.0+edge_offset,0.25), # -sqrt(3)/4 , 0.25
 		]
 	)
 	
 	$"Terrain MultiMesh".multimesh.mesh = ArrayMesh.new()
 	$"Terrain MultiMesh".multimesh.mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, mesh_data)
 	
-	#ResourceSaver.save($"Terrain MultiMesh".multimesh.mesh, "res://hexagon.tres", ResourceSaver.FLAG_COMPRESS)
+	ResourceSaver.save($"Terrain MultiMesh".multimesh.mesh, "res://hexagon.tres", ResourceSaver.FLAG_COMPRESS)
 
 func generate_terrain_map() -> void:
 	$"Terrain MultiMesh".multimesh.instance_count = Map.size.x * Map.size.y
@@ -437,9 +447,17 @@ func get_tile_color(pos : Vector2i) -> Color:
 			color = Color("053225") # jungle
 		_:
 			color = Color.TRANSPARENT # other
+	
+	### Transparency formula to apply controller hue to tiles
+	
+	var opacity = 0.35;
 	var controller = Map.tile_map[pos.x][pos.y].controller
+	
 	if controller > 0:
-		color += Map.countries[controller].color
+		
+		var controller_color = Map.countries[controller-1].color
+		
+		color = Color(((1-opacity)*color.r) + opacity*controller_color.r, ((1-opacity)*color.g) + opacity*controller_color.g, ((1-opacity)*color.b) + opacity*controller_color.b) 
 	return color
 
 ### Interaction with the world
@@ -556,11 +574,18 @@ func inspector_update(_position : Vector2i):
 	var inspector_position : Vector2 = Vector2(0, get_viewport().size.y-inspector_size.y) 
 	inspector.position = inspector_position
 	
-	coords.text = str("Coordinates: ", x+1, ", ", abs(y))
+	coords.text = str("Coordinates: ", x, ", ", y)
 	var info_position : Vector2 = Vector2(0, info.position.x+coords.size.y)
 	info.position = info_position
 	
-	info.text = str("Terrain: ", tile.terrain_types.keys()[Map.tile_map[x][y].terrain_type], "\nBuilding: ", tile.building_types.keys()[Map.tile_map[x][y].building], "\nController: ", Map.tile_map[x][y].controller)
+	var controller : String
+	
+	if Map.tile_map[x][y].controller > 0:
+		controller = Map.countries[Map.tile_map[x][y].controller-1].display_name
+	else:
+		controller = "None"
+	
+	info.text = str("Terrain: ", tile.terrain_types.keys()[Map.tile_map[x][y].terrain_type], "\nBuilding: ", tile.building_types.keys()[Map.tile_map[x][y].building], "\nController: ", controller)
 
 func pick_starting_city_prompt():
 	var starting_city_prompt = preload("res://UI/starting_city_prompt.tscn").instantiate()
@@ -611,7 +636,7 @@ func update_minimap() -> void:
 func update_camera_outline() -> void:
 	var camera_outline_size : Vector2
 	var camera_position : Vector2
-	var aspect_ratio : Vector2 = Vector2(get_viewport().size.x, get_viewport().size.y).normalized()
+	var _aspect_ratio : Vector2 = Vector2(get_viewport().size.x, get_viewport().size.y).normalized()
 	
 	camera_outline_size = Vector2(20,20)
 	camera_position = Vector2(camera.position.x*2,camera.position.z*2)

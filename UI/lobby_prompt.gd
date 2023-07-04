@@ -7,7 +7,7 @@ extends Control
 func _ready():
 	var countries = Map.countries
 	for country in countries:
-		list.add_item(country.Display_Name, country.flag, true)
+		list.add_item(country.display_name, country.flag, true)
 	new_button.connect("button_down", Callable(self, "on_new_button_pressed"))
 	play_button.connect("button_down", Callable(self, "on_play_button_pressed"))
 

@@ -15,7 +15,7 @@ func _ready():
 	resolution_change()
 
 func resolution_change():
-	var aspect_ratio = Vector2(get_viewport().get_size().x, get_viewport().get_size().y).normalized()
+	var _aspect_ratio = Vector2(get_viewport().get_size().x, get_viewport().get_size().y).normalized()
 	$Panel.position = Vector2(0,0)
 	#$Panel.size = Vector2(aspect_ratio.x*500,aspect_ratio.y*2500)
 

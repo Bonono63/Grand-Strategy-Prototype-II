@@ -4,5 +4,5 @@ extends Node
 ## A class for storing misc country data
 
 var color : Color
-var Display_Name : String
+var display_name : String
 var flag : ImageTexture

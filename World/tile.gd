@@ -8,13 +8,6 @@ var wall_level : int
 var controller : int
 var resource : int
 
-#func add_building(_type : int):
-#	print(tile.building_types.keys()[_type])
-#	if buildings.size() <= building_slots:
-#		var building = Building.new()
-#		building.type = _type
-#		buildings.append(building)
-
 enum resource_type
 {
 	empty,
