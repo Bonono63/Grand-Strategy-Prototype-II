@@ -131,15 +131,26 @@ func on_building_map_update(pos : Vector2i):
 	
 	var building = Map.tile_map[pos.x][pos.y].building
 	
-	var instance
+	var instance = null
+	
+	var _name = str(pos.y+(pos.x*Map.size.x))
+	
+	for child in $"Building Layer".get_child_count():
+		var node = $"Building Layer".get_child(child)
+		if node.name == _name:
+			node.queue_free()
 	
 	match building:
 		tile.building_types.city_center:
-			instance = preload("res://World/city_model.tscn").instantiate()
-			var world_space = get_tile_world_pos(pos)
-			instance.position = Vector3(world_space.x, 0, world_space.y)
+			instance = preload("res://World/city_center_model.tscn").instantiate()
+		tile.building_types.urban_center:
+			instance = preload("res://World/urban_model.tscn").instantiate()
 	
-	$"Building Layer".add_child(instance)
+	if instance != null:
+		instance.name = _name
+		var world_space = get_tile_world_pos(pos)
+		instance.position = Vector3(world_space.x, 0, world_space.y)
+		$"Building Layer".add_child(instance)
 
 func on_territory_map_update(coordinates : Vector2i):
 	set_color(coordinates, get_tile_color(coordinates))
@@ -585,7 +596,21 @@ func inspector_update(_position : Vector2i):
 	else:
 		controller = "None"
 	
-	info.text = str("Terrain: ", tile.terrain_types.keys()[Map.tile_map[x][y].terrain_type], "\nBuilding: ", tile.building_types.keys()[Map.tile_map[x][y].building], "\nController: ", controller)
+	var building_details = ""
+	
+	if Map.tile_map[x][y].building > 0:
+		match Map.tile_map[x][y].building:
+			tile.building_types.city_center:
+				var details = Map.city_centers[str(y+(x*Map.size.x))]
+				building_details = str("\nfood: ",details.food,"\npop: ",details.pop)
+			tile.building_types.urban_center:
+				var details = Map.city_centers[str(y+(x*Map.size.x))]
+				building_details = str("\npop: ",details.pop)
+	
+	info.text = str("Terrain: ", tile.terrain_types.keys()[Map.tile_map[x][y].terrain_type],
+	"\nBuilding: ", tile.building_types.keys()[Map.tile_map[x][y].building],
+	building_details,
+	"\nController: ", controller)
 
 func pick_starting_city_prompt():
 	var starting_city_prompt = preload("res://UI/starting_city_prompt.tscn").instantiate()

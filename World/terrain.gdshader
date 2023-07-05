@@ -71,7 +71,7 @@ void fragment() {
 		if (!(length(center) > 0.435))
 		{
 			//ALBEDO = vec3(0.0);
-			ALBEDO = COLOR.xyz;
+			//ALBEDO = COLOR.xyz;
 		}
 	}
 	

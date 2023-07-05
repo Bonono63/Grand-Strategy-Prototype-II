@@ -39,8 +39,9 @@ enum terrain_types {
 enum building_types {
 	empty,
 	city_center,
+	urban_center,
+	farm,
 	castle,
 	moat,
-	farm,
 	mill,
 }
