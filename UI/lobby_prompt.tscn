@@ -63,6 +63,7 @@ offset_right = -20.0
 offset_bottom = -12.0
 grow_horizontal = 0
 grow_vertical = 0
+disabled = true
 text = "Play Selected"
 
 [node name="ItemList" type="ItemList" parent="Panel"]

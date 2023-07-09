@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://llh8f0ewxd74"]
+[gd_scene load_steps=5 format=3 uid="uid://bnqsq4be6a0yu"]
 
 [ext_resource type="Texture2D" uid="uid://rpfa5bwiwx82" path="res://Unit Icons/Infantry Division.png" id="2_5cvph"]
 [ext_resource type="Script" path="res://Unit.gd" id="2_b6ugp"]

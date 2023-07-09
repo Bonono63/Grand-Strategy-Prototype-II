@@ -12,7 +12,7 @@ func _ready():
 	confirm_button.connect("button_down", Callable(self, "confirmed"))
 
 func on_tile_select(_pos):
-	if Map.tile_map[_pos.x][_pos.y].terrain_type != tile.terrain_types.ocean and Map.tile_map[_pos.x][_pos.y].terrain_type != tile.terrain_types.swamp and Map.tile_map[_pos.x][_pos.y].terrain_type != tile.terrain_types.shallow_water:
+	if Map.tile_map[_pos.x][_pos.y].terrain_type != "ocean" and Map.tile_map[_pos.x][_pos.y].terrain_type != "swamp" and Map.tile_map[_pos.x][_pos.y].terrain_type != "shallow_water":
 		selected_tile = _pos
 		$Label.text = str("Select Your Starting location ", selected_tile)
 	else:
@@ -28,7 +28,6 @@ func confirmed():
 	Queue.add_command(Queue.types.set_territory, {"x":selected_tile.x-1, "y":selected_tile.y, "controller_id":Map.countries.size()+1})
 	Queue.add_command(Queue.types.set_territory, {"x":selected_tile.x+1, "y":selected_tile.y, "controller_id":Map.countries.size()+1})
 	if selected_tile.y % 2 == 0:
-		print("even")
 		Queue.add_command(Queue.types.set_territory, {"x":selected_tile.x, "y":selected_tile.y+1, "controller_id":Map.countries.size()+1})
 		Queue.add_command(Queue.types.set_territory, {"x":selected_tile.x+1, "y":selected_tile.y+1, "controller_id":Map.countries.size()+1})
 		Queue.add_command(Queue.types.set_territory, {"x":selected_tile.x, "y":selected_tile.y-1, "controller_id":Map.countries.size()+1})
@@ -38,6 +37,6 @@ func confirmed():
 		Queue.add_command(Queue.types.set_territory, {"x":selected_tile.x, "y":selected_tile.y+1, "controller_id":Map.countries.size()+1})
 		Queue.add_command(Queue.types.set_territory, {"x":selected_tile.x-1, "y":selected_tile.y-1, "controller_id":Map.countries.size()+1})
 		Queue.add_command(Queue.types.set_territory, {"x":selected_tile.x, "y":selected_tile.y-1, "controller_id":Map.countries.size()+1})
-	Queue.add_command(Queue.types.construct_building, { "x" : selected_tile.x, "y" : selected_tile.y, "building_type" : tile.building_types.city_center})
+	Queue.add_command(Queue.types.construct_building, { "x" : selected_tile.x, "y" : selected_tile.y, "building_type" : "city_center"})
 	get_parent().get_parent().emit_signal("setup_finished")
 	self.queue_free()

@@ -1,7 +1,7 @@
 [gd_scene load_steps=21 format=3 uid="uid://cr2mhoqo7014t"]
 
 [ext_resource type="Script" path="res://World/World.gd" id="1_wrylp"]
-[ext_resource type="Shader" path="res://World/terrain.gdshader" id="2_cyndq"]
+[ext_resource type="Shader" path="res://World/Terrain/terrain.gdshader" id="2_lcmfu"]
 [ext_resource type="PackedScene" uid="uid://daono88iy1yu0" path="res://World/camera.tscn" id="2_rj17n"]
 [ext_resource type="Script" path="res://UI/minimap_collision.gd" id="4_pjcvx"]
 [ext_resource type="Script" path="res://selection.gd" id="5_kit5i"]
@@ -22,7 +22,7 @@ size = Vector3(1, 0, 1)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_gbxbe"]
 render_priority = 0
-shader = ExtResource("2_cyndq")
+shader = ExtResource("2_lcmfu")
 shader_parameter/enabled = true
 
 [sub_resource type="MultiMesh" id="MultiMesh_3cdo6"]
@@ -117,15 +117,13 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="Debug" parent="GUI" instance=ExtResource("6_g4kjj")]
-
 [node name="location Inspector" type="Panel" parent="GUI"]
 visible = false
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_top = -40.0
-offset_right = 40.0
+offset_top = -200.0
+offset_right = 300.0
 grow_vertical = 0
 mouse_filter = 1
 
@@ -137,9 +135,9 @@ text = "coords"
 
 [node name="info" type="Label" parent="GUI/location Inspector"]
 layout_mode = 0
+offset_top = 26.0
 offset_right = 40.0
-offset_bottom = 23.0
-text = "info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info info v"
+offset_bottom = 49.0
 
 [node name="Minimap" type="ColorRect" parent="GUI"]
 visible = false
@@ -167,7 +165,7 @@ color = Color(0.933333, 0.933333, 0.933333, 0.627451)
 [node name="Area2D" type="Area2D" parent="GUI/Minimap"]
 collision_layer = 2
 collision_mask = 2
-priority = 1.0
+priority = 1
 script = ExtResource("4_pjcvx")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GUI/Minimap/Area2D"]
@@ -183,3 +181,6 @@ offset_bottom = 40.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_p5kmh")
 
 [node name="command_prompt" parent="GUI" instance=ExtResource("8_tmlb6")]
+
+[node name="Debug" parent="GUI" instance=ExtResource("6_g4kjj")]
+visible = false

@@ -1,0 +1,37 @@
+[gd_scene load_steps=3 format=3 uid="uid://debijymuer72n"]
+
+[ext_resource type="Script" path="res://UI/national_ui.gd" id="1_44nne"]
+[ext_resource type="Texture2D" uid="uid://71oipe7x22kx" path="res://UI/flag.png" id="2_56p8r"]
+
+[node name="National UI" type="TabContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+mouse_force_pass_scroll_events = false
+script = ExtResource("1_44nne")
+
+[node name="Politics" type="Panel" parent="."]
+layout_mode = 2
+mouse_force_pass_scroll_events = false
+
+[node name="Label" type="Label" parent="Politics"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "National UI"
+
+[node name="FLAG" type="TextureRect" parent="Politics"]
+visible = false
+texture_filter = 1
+layout_mode = 2
+offset_top = -31.0
+offset_right = 400.0
+offset_bottom = 369.0
+texture = ExtResource("2_56p8r")
+
+[node name="Construction" type="Panel" parent="."]
+visible = false
+layout_mode = 2

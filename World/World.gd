@@ -24,8 +24,6 @@ extends Node3D
 
 const HEXAGON_WIDTH = sqrt(3)/2
 
-var sand_color = Color(1, 0.870588, 0.501961, 1)
-
 var terrain_texture : ImageTexture
 
 var minimap_drag = false
@@ -36,14 +34,19 @@ var pause : bool
 
 signal tile_selected
 signal starting_city_selection
-signal toggle_minimap
 signal setup_finished
 signal country_selected
+signal toggle_minimap
+signal toggle_debug
+signal toggle_command_prompt
 
 # initialize the world settings etc. (basically decide whether to load or generate a world)
 func init(size : Vector2i, _save : String):
 	Queue.clear_queue()
 	Map.clear(size)
+	Map.load_map_resources("res://World/")
+	#await Map.resources_loaded
+	print("fortnite")
 	if _save.is_empty():
 		generate_world(size,randi())
 	else:
@@ -64,7 +67,9 @@ func _unhandled_input(event):
 		if event.is_action_pressed("tab"):
 			emit_signal("toggle_minimap")
 		if event.is_action_pressed("open_prompt"):
-			$GUI/command_prompt.show()
+			emit_signal("toggle_command_prompt")
+		if event.is_action_pressed("debug_toggle"):
+			emit_signal("toggle_debug")
 
 # can be called anywhere to return to the main menu
 func return_to_main_menu():
@@ -129,9 +134,9 @@ func on_terrain_map_update(coordinates : Vector2i):
 
 func on_building_map_update(pos : Vector2i):
 	
-	var building = Map.tile_map[pos.x][pos.y].building
+	var building_type = Map.tile_map[pos.x][pos.y].building_type
 	
-	var instance = null
+	var instance = preload("res://World/Buildings/Building.tscn").instantiate()
 	
 	var _name = str(pos.y+(pos.x*Map.size.x))
 	
@@ -140,17 +145,19 @@ func on_building_map_update(pos : Vector2i):
 		if node.name == _name:
 			node.queue_free()
 	
-	match building:
-		tile.building_types.city_center:
-			instance = preload("res://World/city_center_model.tscn").instantiate()
-		tile.building_types.urban_center:
-			instance = preload("res://World/urban_model.tscn").instantiate()
+	var path = "res://World/map_resources/building/"+Map.building_types[building_type].model
 	
-	if instance != null:
-		instance.name = _name
-		var world_space = get_tile_world_pos(pos)
-		instance.position = Vector3(world_space.x, 0, world_space.y)
-		$"Building Layer".add_child(instance)
+	#print(path)
+	var model = load(path)
+	if model == null:
+		printerr("Unable to find the specified model ", path)
+	else:
+		instance.mesh = model
+	
+	instance.name = _name
+	var world_space = get_tile_world_pos(pos)
+	instance.position = Vector3(world_space.x, 0, world_space.y)
+	$"Building Layer".add_child(instance)
 
 func on_territory_map_update(coordinates : Vector2i):
 	set_color(coordinates, get_tile_color(coordinates))
@@ -288,23 +295,23 @@ func generate_world(size : Vector2i , _seed : int):
 			var _tile = tile.new()
 			#ocean
 			if height_image.get_pixel(x,y).r <= sea_level:
-				_tile.terrain_type = tile.terrain_types.ocean
+				_tile.terrain_type = "ocean"
 			
 			#coast
 			else :if height_image.get_pixel(x,y).r <= coast_height:
-				_tile.terrain_type = tile.terrain_types.shallow_water
+				_tile.terrain_type = "shallow_water"
 			
 			#river gen
 			else :if river_image.get_pixel(x,y).r >= river_cutoff:
-				_tile.terrain_type = tile.terrain_types.shallow_water
+				_tile.terrain_type = "shallow_water"
 			
 			#shore
 			else: if height_image.get_pixel(x,y).r <= shore_height:
-				_tile.terrain_type = tile.terrain_types.shore
+				_tile.terrain_type = "shore"
 			
 			#moutains
 			else: if height_image.get_pixel(x,y).r >= mountain_height:
-				_tile.terrain_type = tile.terrain_types.mountain
+				_tile.terrain_type = "mountain"
 			
 			else: 
 				var moist
@@ -326,21 +333,21 @@ func generate_world(size : Vector2i , _seed : int):
 					moisture.DRY:
 						match temp:
 							temperature.HOT:
-								_tile.terrain_type = tile.terrain_types.desert # desert
+								_tile.terrain_type = "desert" # desert
 							temperature.WARM:
-								_tile.terrain_type = tile.terrain_types.plains # plains
+								_tile.terrain_type = "plain" # plains
 					moisture.MOIST:
 						match temp:
 							temperature.HOT:
-								_tile.terrain_type = tile.terrain_types.plains # plains
+								_tile.terrain_type = "plain" # plains
 							temperature.WARM:
-								_tile.terrain_type = tile.terrain_types.forest # forest
+								_tile.terrain_type = "forest" # forest
 					moisture.WET:
 						match temp:
 							temperature.HOT:
-								_tile.terrain_type = tile.terrain_types.jungle # jungle
+								_tile.terrain_type = "jungle" # jungle
 							temperature.WARM:
-								_tile.terrain_type = tile.terrain_types.swamp # swamp
+								_tile.terrain_type = "swamp" # swamp
 			tile_map[x][y] = _tile
 	
 	Map.tile_map = tile_map
@@ -397,7 +404,7 @@ func setup_multimesh_mesh():
 	$"Terrain MultiMesh".multimesh.mesh = ArrayMesh.new()
 	$"Terrain MultiMesh".multimesh.mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, mesh_data)
 	
-	ResourceSaver.save($"Terrain MultiMesh".multimesh.mesh, "res://hexagon.tres", ResourceSaver.FLAG_COMPRESS)
+	#ResourceSaver.save($"Terrain MultiMesh".multimesh.mesh, "res://hexagon.tres", ResourceSaver.FLAG_COMPRESS)
 
 func generate_terrain_map() -> void:
 	$"Terrain MultiMesh".multimesh.instance_count = Map.size.x * Map.size.y
@@ -437,27 +444,12 @@ func get_color(coordinates : Vector2i) -> Color:
 
 func get_tile_color(pos : Vector2i) -> Color:
 	var color : Color
-	match (Map.tile_map[pos.x][pos.y].terrain_type):
-		tile.terrain_types.ocean:
-			color = Color("020873") # ocean
-		tile.terrain_types.shallow_water:
-			color = Color("449dd1") # coast
-		tile.terrain_types.shore:
-			color = Color(sand_color) # shore
-		tile.terrain_types.mountain:
-			color = Color("585858") # mountain
-		tile.terrain_types.plains:
-			color = Color("4daa13") # plains
-		tile.terrain_types.forest:
-			color = Color("226c00") # forest
-		tile.terrain_types.swamp:
-			color = Color("854d27") # swamp
-		tile.terrain_types.desert:
-			color = Color(sand_color) # desert
-		tile.terrain_types.jungle:
-			color = Color("053225") # jungle
-		_:
-			color = Color.TRANSPARENT # other
+	var terrain_type = Map.tile_map[pos.x][pos.y].terrain_type
+	if terrain_type != null:
+		color = Color(Map.terrain_types[terrain_type].color)
+	else:
+		printerr("no terrain type at location: ", pos)
+		color = Color(0.0,0.0,0.0,0.0)
 	
 	### Transparency formula to apply controller hue to tiles
 	
@@ -578,16 +570,7 @@ func inspector_update(_position : Vector2i):
 	
 	inspector.show()
 	
-	var aspect_ratio : Vector2 = Vector2(get_viewport().size.x, get_viewport().size.y).normalized()
-	var inspector_size : Vector2 = Vector2(aspect_ratio.x*400, aspect_ratio.y*400)
-	inspector.size = inspector_size
-	
-	var inspector_position : Vector2 = Vector2(0, get_viewport().size.y-inspector_size.y) 
-	inspector.position = inspector_position
-	
 	coords.text = str("Coordinates: ", x, ", ", y)
-	var info_position : Vector2 = Vector2(0, info.position.x+coords.size.y)
-	info.position = info_position
 	
 	var controller : String
 	
@@ -598,17 +581,11 @@ func inspector_update(_position : Vector2i):
 	
 	var building_details = ""
 	
-	if Map.tile_map[x][y].building > 0:
-		match Map.tile_map[x][y].building:
-			tile.building_types.city_center:
-				var details = Map.city_centers[str(y+(x*Map.size.x))]
-				building_details = str("\nfood: ",details.food,"\npop: ",details.pop)
-			tile.building_types.urban_center:
-				var details = Map.city_centers[str(y+(x*Map.size.x))]
-				building_details = str("\npop: ",details.pop)
+	if !Map.tile_map[x][y].building_type.is_empty():
+		building_details = str("\nBuilding Details: ", Map.buildings[str(y+(x*Map.size.x))].values)
 	
-	info.text = str("Terrain: ", tile.terrain_types.keys()[Map.tile_map[x][y].terrain_type],
-	"\nBuilding: ", tile.building_types.keys()[Map.tile_map[x][y].building],
+	info.text = str("Terrain: ", Map.tile_map[x][y].terrain_type,
+	"\nBuilding: ", Map.tile_map[x][y].building_type,
 	building_details,
 	"\nController: ", controller)
 
@@ -624,6 +601,8 @@ func on_set_up_finished():
 	print("world setup finished")
 	connect("tile_selected", Callable(self, "inspector_update"))
 	connect("toggle_minimap", Callable(self, "on_toggle_minimap"))
+	connect("toggle_debug", Callable(self, "on_toggle_debug"))
+	connect("toggle_command_prompt", Callable(self, "on_toggle_command_prompt"))
 	$GUI/Minimap/Area2D.connect("collision", minimap_input_event)
 
 ### Minimap
@@ -674,3 +653,19 @@ func update_camera_outline() -> void:
 
 func set_camera_position(pos : Vector2):
 	camera.position = Vector3(pos.x, camera.position.y, pos.y)
+
+### DEBUG
+
+func on_toggle_debug():
+	var debug = $GUI/Debug
+	if debug.visible:
+		debug.hide()
+	else:
+		debug.show()
+
+func on_toggle_command_prompt():
+	var command_prompt = $GUI/command_prompt
+	if command_prompt.visible:
+		command_prompt.hide()
+	else:
+		command_prompt.show()

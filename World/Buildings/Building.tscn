@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://d4i7xn0eftyhf"]
+
+[ext_resource type="Script" path="res://World/Buildings/building_model.gd" id="1_57jeh"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sq2y7"]
+albedo_color = Color(0.662745, 0.662745, 0.662745, 1)
+
+[node name="Building" type="MeshInstance3D"]
+material_override = SubResource("StandardMaterial3D_sq2y7")
+script = ExtResource("1_57jeh")

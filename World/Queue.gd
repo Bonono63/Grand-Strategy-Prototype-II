@@ -11,7 +11,7 @@ func _process(_delta):
 		### matches each command type to its corresponding actions
 		match (c.type):
 			types.construct_building:
-				Map.add_building(c.arguments["x"], c.arguments["y"], c.arguments["building_type"])
+				Map.set_building(c.arguments["x"], c.arguments["y"], c.arguments["building_type"])
 			types.set_territory:
 				Map.set_territory(c.arguments["x"], c.arguments["y"], c.arguments["controller_id"])
 			types.set_terrain:

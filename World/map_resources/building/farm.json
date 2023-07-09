@@ -1,0 +1,5 @@
+{
+	"production_cost": 5,
+	"values": {"food_production":1},
+	"model": "farm.obj",
+}
