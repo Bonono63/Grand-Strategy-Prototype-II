@@ -5,5 +5,5 @@ var terrain_type : String
 var building_type : String
 var has_walls : bool
 var wall_level : int
-var controller : int
+var controller : String
 var resource_type : String

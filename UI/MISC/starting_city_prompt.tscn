@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://dmv4aaekiasdh"]
 
-[ext_resource type="Script" path="res://UI/starting_city_prompt.gd" id="1_3fojj"]
+[ext_resource type="Script" path="res://UI/MISC/starting_city_prompt.gd" id="1_y2746"]
 
 [node name="Panel" type="Panel"]
 anchors_preset = 8
@@ -14,7 +14,7 @@ offset_right = 197.5
 offset_bottom = 51.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_3fojj")
+script = ExtResource("1_y2746")
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 1
@@ -44,4 +44,5 @@ offset_right = 35.5
 offset_bottom = 43.0
 grow_horizontal = 2
 grow_vertical = 2
+disabled = true
 text = "Confirm"

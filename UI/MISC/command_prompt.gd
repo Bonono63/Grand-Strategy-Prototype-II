@@ -13,10 +13,10 @@ func input_parser(command : String) -> int:
 			Queue.add_command(Queue.types.set_terrain, {"x":int(parameters[1]),"y":int(parameters[2]),"terrain_type":int(parameters[3])})
 			out(str("terrain set to ", parameters[3], " at ", parameters[1], ", ", parameters[2],"\n"))
 		"set_territory":
-			Queue.add_command(Queue.types.set_territory, {"x":int(parameters[1]),"y":int(parameters[2]),"controller_id":int(parameters[3])})
+			Queue.add_command(Queue.types.set_territory, {"x":int(parameters[1]),"y":int(parameters[2]),"controller_id":parameters[3]})
 			out(str("controller of ", parameters[1], ", ", parameters[2], " set to ", parameters[3],"\n"))
 		"set_building":
-			Queue.add_command(Queue.types.construct_building, {"x":int(parameters[1]),"y":int(parameters[2]),"building_type":parameters[3]})
+			Queue.add_command(Queue.types.set_building, {"x":int(parameters[1]),"y":int(parameters[2]),"building_type":parameters[3], "values":{}})
 			out(str("building set to ", parameters[3], " at ", parameters[1], ", ", parameters[2],"\n"))
 		"close":
 			hide()

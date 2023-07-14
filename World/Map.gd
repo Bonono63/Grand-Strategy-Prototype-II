@@ -8,13 +8,15 @@ signal map_loaded
 signal terrain_map_change
 signal building_map_change
 signal territory_map_change
+
 signal country_created
+signal culture_created
 
 var size : Vector2i
 
 var tile_map : Array
 
-var countries : Array
+var countries : Dictionary
 
 var buildings : Dictionary
 
@@ -22,12 +24,18 @@ var terrain_types : Dictionary = {}
 var building_types : Dictionary = {}
 var resource_types : Dictionary = {}
 
+var cultures : Dictionary = {}
+
 # Meant to clear all previously stored tile data when the World is exited ( The Map is otherwise persistant in memory after loading it )
 func clear(_size : Vector2i):
 	size.x = _size.x
 	size.y = _size.y
 	utils.initate_2d_array(tile_map, size.x, size.y)
-	countries = []
+	countries = {}
+	terrain_types = {}
+	building_types = {}
+	resource_types = {}
+	cultures = {}
 
 func set_terrain(x : int, y : int, value : String):
 	if x <= size.x && y <= size.y:
@@ -35,32 +43,42 @@ func set_terrain(x : int, y : int, value : String):
 			tile_map[x][y].terrain_type = value
 			emit_signal("terrain_map_change", Vector2i(x,y))
 	else:
-		print("terrain arguments where out of range")
+		printerr("terrain arguments where out of range")
 
-func set_building(x : int, y : int, value : String):
-	if x <= size.x && y <= size.y && building_types.has(value):
-		tile_map[x][y].building_type = value
+func set_building(x : int, y : int, building_type : String, values : Dictionary):
+	if x <= size.x && y <= size.y && building_types.has(building_type):
+		tile_map[x][y].building_type = building_type
 		var pos = (y+(x*Map.size.x))
-		buildings[str(pos)] = building_types[value]
+		buildings[str(pos)] = building_types[building_type]
+		if !values.is_empty():
+			buildings[str(pos)].values = values
 		emit_signal("building_map_change", Vector2i(x,y))
 	else:
-		print("building arguments where out of range")
+		printerr("building arguments where out of range")
 
 # set the controller of the tile
-func set_territory(x : int, y : int, country_value : int):
+func set_territory(x : int, y : int, country_value : String):
 	if x <= size.x && y <= size.y:
 		tile_map[x][y].controller = country_value
 		emit_signal("territory_map_change", Vector2i(x,y))
 	else:
-		print("territory arguments where out of range")
+		printerr("territory arguments where out of range")
 
 func create_country(color : Color, display_name : String):
 	var new_country = Country.new()
 	
 	new_country.color = color
-	new_country.display_name = display_name
-	countries.append(new_country)
+	countries[display_name] = new_country
 	emit_signal("country_created")
+
+func create_culture(gender_ratio : float, life_span : int, display_name : String):
+	var _culture = culture.new()
+	
+	_culture.life_span = life_span
+	_culture.gender_ratio = gender_ratio
+	
+	cultures[display_name] = _culture
+	emit_signal("culture_created")
 
 func iterate_buildings() -> void:
 	for _building in buildings:
@@ -77,7 +95,6 @@ func load_map_resources(path : String):
 	
 	var terrain_dir = DirAccess.open(native_resources_dir+"/terrain/")
 	if terrain_dir:
-		print(terrain_dir.get_current_dir())
 		terrain_dir.list_dir_begin()
 		var file_name = terrain_dir.get_next()
 		
@@ -89,7 +106,6 @@ func load_map_resources(path : String):
 	
 	var building_dir = DirAccess.open(native_resources_dir+"/building/")
 	if building_dir:
-		print(building_dir.get_current_dir())
 		building_dir.list_dir_begin()
 		var file_name = building_dir.get_next()
 		
@@ -101,7 +117,6 @@ func load_map_resources(path : String):
 	
 	var resources_dir = DirAccess.open(native_resources_dir+"/resource/")
 	if resources_dir:
-		print(resources_dir.get_current_dir())
 		resources_dir.list_dir_begin()
 		var file_name = resources_dir.get_next()
 		

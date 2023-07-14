@@ -5,9 +5,9 @@
 [ext_resource type="PackedScene" uid="uid://daono88iy1yu0" path="res://World/camera.tscn" id="2_rj17n"]
 [ext_resource type="Script" path="res://UI/minimap_collision.gd" id="4_pjcvx"]
 [ext_resource type="Script" path="res://selection.gd" id="5_kit5i"]
-[ext_resource type="PackedScene" uid="uid://dvwglwx540ukw" path="res://UI/debug.tscn" id="6_g4kjj"]
+[ext_resource type="PackedScene" uid="uid://dvwglwx540ukw" path="res://UI/MISC/debug.tscn" id="6_g4kjj"]
 [ext_resource type="Shader" path="res://World/vignette.gdshader" id="7_ya128"]
-[ext_resource type="PackedScene" uid="uid://3gm0vdvdp44d" path="res://UI/command_prompt.tscn" id="8_tmlb6"]
+[ext_resource type="PackedScene" uid="uid://3gm0vdvdp44d" path="res://UI/MISC/command_prompt.tscn" id="8_tmlb6"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_olgbl"]
 size = Vector3(1, 0, 1)
@@ -181,6 +181,20 @@ offset_bottom = 40.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_p5kmh")
 
 [node name="command_prompt" parent="GUI" instance=ExtResource("8_tmlb6")]
+top_level = true
 
 [node name="Debug" parent="GUI" instance=ExtResource("6_g4kjj")]
 visible = false
+top_level = true
+
+[node name="map_mode" type="OptionButton" parent="GUI"]
+visible = false
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -122.0
+offset_top = -31.0
+grow_horizontal = 0
+grow_vertical = 0

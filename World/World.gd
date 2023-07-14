@@ -33,20 +33,16 @@ var minimap_size : Vector2
 var pause : bool
 
 signal tile_selected
-signal starting_city_selection
+signal tile_hover
+
 signal setup_finished
 signal country_selected
-signal toggle_minimap
-signal toggle_debug
-signal toggle_command_prompt
 
 # initialize the world settings etc. (basically decide whether to load or generate a world)
 func init(size : Vector2i, _save : String):
 	Queue.clear_queue()
 	Map.clear(size)
 	Map.load_map_resources("res://World/")
-	#await Map.resources_loaded
-	print("fortnite")
 	if _save.is_empty():
 		generate_world(size,randi())
 	else:
@@ -65,11 +61,11 @@ func _unhandled_input(event):
 				pause = false
 				remove_child(get_child(-1))
 		if event.is_action_pressed("tab"):
-			emit_signal("toggle_minimap")
+			toggle_control_visibility(minimap)
 		if event.is_action_pressed("open_prompt"):
-			emit_signal("toggle_command_prompt")
+			toggle_control_visibility($GUI/command_prompt)
 		if event.is_action_pressed("debug_toggle"):
-			emit_signal("toggle_debug")
+			toggle_control_visibility($GUI/Debug)
 
 # can be called anywhere to return to the main menu
 func return_to_main_menu():
@@ -110,8 +106,8 @@ func on_map_loaded():
 	
 	### decide whether to ask for a new country or to select a country
 	
-	Map.create_country(Color("473300"), "Imperial Germany")
-	Map.create_country(Color("080084"), "Great Britain")
+	Map.create_country(Color("473300"), "imperial_germany")
+	Map.create_country(Color("080084"), "great_britain")
 	
 	if !Map.countries.is_empty():
 		open_lobby_prompt()
@@ -120,14 +116,16 @@ func on_map_loaded():
 	
 	for x in 6:
 		for y in 6:
-			Queue.add_command(Queue.types.set_territory, {"x":x, "y":y, "controller_id":1})
+			Queue.add_command(Queue.types.set_territory, {"x":x, "y":y, "controller_id":"imperial_germany"})
 	
 	for x in 6:
 		for y in 6:
-			Queue.add_command(Queue.types.set_territory, {"x":x+6, "y":y+6, "controller_id":2})
+			Queue.add_command(Queue.types.set_territory, {"x":x+6, "y":y+6, "controller_id":"great_britain"})
 	
 	# Center the camera in the world
 	set_camera_position(Vector2((Map.size.x*HEXAGON_WIDTH)/2, (Map.size.y*0.75)/2))
+	
+	map_mode_setup()
 
 func on_terrain_map_update(coordinates : Vector2i):
 	set_color(coordinates, get_tile_color(coordinates))
@@ -456,9 +454,9 @@ func get_tile_color(pos : Vector2i) -> Color:
 	var opacity = 0.35;
 	var controller = Map.tile_map[pos.x][pos.y].controller
 	
-	if controller > 0:
+	if controller != "":
 		
-		var controller_color = Map.countries[controller-1].color
+		var controller_color = Map.countries[controller].color
 		
 		color = Color(((1-opacity)*color.r) + opacity*controller_color.r, ((1-opacity)*color.g) + opacity*controller_color.g, ((1-opacity)*color.b) + opacity*controller_color.b) 
 	return color
@@ -478,15 +476,15 @@ func world_collision_setup():
 var prev_input_pos : Vector2i
 
 func world_input_event(_a, event, _position, _d, _e):
-	if event is InputEventMouseButton:
-		if event.is_action_released("left_click"):
-			var transformed = transform_input_position(_position)
-			if transformed.x >= 0 and transformed.x <= Map.size.x-1 and transformed.y >= 0 and transformed.y <= Map.size.y-1:
-				if prev_input_pos != null:
-					set_color(prev_input_pos, get_tile_color(prev_input_pos))
-				set_color(Vector2i(transformed.x, transformed.y), "ed2e21")
-				prev_input_pos = Vector2i(transformed.x, transformed.y)
-				emit_signal("tile_selected", transformed)
+	var transformed = transform_input_position(_position)
+	if transformed.x >= 0 and transformed.x <= Map.size.x-1 and transformed.y >= 0 and transformed.y <= Map.size.y-1:
+		emit_signal("tile_hover", transformed)
+		if event is InputEventMouseButton && event.is_action_pressed("left_click"):
+			if prev_input_pos != null:
+				set_color(prev_input_pos, get_tile_color(prev_input_pos))
+			set_color(Vector2i(transformed.x, transformed.y), "ed2e21")
+			prev_input_pos = Vector2i(transformed.x, transformed.y)
+			emit_signal("tile_selected", transformed)
 
 func transform_input_position(pos : Vector3) -> Vector2:
 	
@@ -574,8 +572,8 @@ func inspector_update(_position : Vector2i):
 	
 	var controller : String
 	
-	if Map.tile_map[x][y].controller > 0:
-		controller = Map.countries[Map.tile_map[x][y].controller-1].display_name
+	if Map.tile_map[x][y].controller != "":
+		controller = Map.tile_map[x][y].controller
 	else:
 		controller = "None"
 	
@@ -590,32 +588,31 @@ func inspector_update(_position : Vector2i):
 	"\nController: ", controller)
 
 func pick_starting_city_prompt():
-	var starting_city_prompt = preload("res://UI/starting_city_prompt.tscn").instantiate()
+	var starting_city_prompt = preload("res://UI/MISC/starting_city_prompt.tscn").instantiate()
 	$GUI.add_child(starting_city_prompt)
 
 func open_lobby_prompt():
-	var lobby_prompt = preload("res://UI/lobby_prompt.tscn").instantiate()
+	var lobby_prompt = preload("res://UI/MISC/lobby_prompt.tscn").instantiate()
 	$GUI.add_child(lobby_prompt)
 
 func on_set_up_finished():
 	print("world setup finished")
-	connect("tile_selected", Callable(self, "inspector_update"))
-	connect("toggle_minimap", Callable(self, "on_toggle_minimap"))
-	connect("toggle_debug", Callable(self, "on_toggle_debug"))
-	connect("toggle_command_prompt", Callable(self, "on_toggle_command_prompt"))
+	connect("tile_hover", Callable(self, "inspector_update"))
+	connect("toggle_control", Callable(self, "toggle_control_visibility"))
 	$GUI/Minimap/Area2D.connect("collision", minimap_input_event)
+	var country_hud = preload("res://UI/country_hud.tscn").instantiate()
+	country_hud.connect("building_selected", Callable(self, "on_building_selected"))
+	$GUI.add_child(country_hud)
+	$GUI/map_mode.show()
+
+func on_building_selected(_building : String):
+	print(_building, " selected")
+	$GUI/map_mode.selected = Player.map_mode_list.construction
+	Player.set_map_mode(Player.map_mode_list.construction)
 
 ### Minimap
 
-func on_toggle_minimap():
-	#print("minimap toggled")
-	if minimap.visible:
-		minimap.hide()
-	else:
-		minimap.show()
-
 func minimap_input_event(_a, event, _c):
-	#print("minimap_input_event")
 	drag = event.position
 	if event is InputEventMouseButton:
 		if event.is_action_pressed("left_click"):
@@ -656,16 +653,13 @@ func set_camera_position(pos : Vector2):
 
 ### DEBUG
 
-func on_toggle_debug():
-	var debug = $GUI/Debug
-	if debug.visible:
-		debug.hide()
+func toggle_control_visibility(control):
+	if control.visible:
+		control.hide()
 	else:
-		debug.show()
+		control.show()
 
-func on_toggle_command_prompt():
-	var command_prompt = $GUI/command_prompt
-	if command_prompt.visible:
-		command_prompt.hide()
-	else:
-		command_prompt.show()
+func map_mode_setup():
+	for mode in Player.map_mode_list:
+		$GUI/map_mode.add_item(mode)
+	$GUI/map_mode.connect("item_selected", Callable(Player, "set_map_mode"))

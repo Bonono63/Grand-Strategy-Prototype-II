@@ -4,20 +4,22 @@ extends Node
 
 var commands : Array
 
-enum types { construct_building, create_country, set_territory, set_terrain, division_movement }
+enum types { create_country, create_culture, sync_country_data, set_territory, set_building, set_terrain, division_movement }
 
 func _process(_delta):
 	for c in commands:
 		### matches each command type to its corresponding actions
 		match (c.type):
-			types.construct_building:
-				Map.set_building(c.arguments["x"], c.arguments["y"], c.arguments["building_type"])
+			types.create_country:
+				Map.create_country(c.arguments["color"], c.arguments["display_name"])
+			types.create_culture:
+				Map.create_culture(c.arguments["gender_ratio"], c.arguments["life_span"], c.arguments["display_name"])
+			types.set_building:
+				Map.set_building(c.arguments["x"], c.arguments["y"], c.arguments["building_type"], c.arguments["values"])
 			types.set_territory:
 				Map.set_territory(c.arguments["x"], c.arguments["y"], c.arguments["controller_id"])
 			types.set_terrain:
 				Map.set_terrain(c.arguments["x"], c.arguments["y"], c.arguments["terrain_type"])
-			types.create_country:
-				Map.create_country(c.arguments["color"], c.arguments["display_name"])
 		commands.erase(c)
 
 func add_command(type : int, arguments : Dictionary):

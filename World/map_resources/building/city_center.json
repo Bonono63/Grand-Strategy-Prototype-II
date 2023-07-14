@@ -1,5 +1,5 @@
 {
 	"production_cost": 15,
-	"values": {"pop":3,"food":10},
+	"values": {"pop":{},"food":10},
 	"model": "city_center.obj",
 }
