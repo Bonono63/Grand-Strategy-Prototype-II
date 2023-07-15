@@ -32,14 +32,20 @@ var minimap_size : Vector2
 
 var pause : bool
 
+var singleplayer : bool
+
 signal tile_selected
 signal tile_hover
 
 signal setup_finished
 signal country_selected
 
+var selected_building
+var prev_input_pos : Vector2i
+
 # initialize the world settings etc. (basically decide whether to load or generate a world)
-func init(size : Vector2i, _save : String):
+func init(size : Vector2i, _save : String, _singleplayer : bool):
+	singleplayer = _singleplayer
 	Queue.clear_queue()
 	Map.clear(size)
 	Map.load_map_resources("res://World/")
@@ -62,7 +68,7 @@ func _unhandled_input(event):
 				remove_child(get_child(-1))
 		if event.is_action_pressed("tab"):
 			toggle_control_visibility(minimap)
-		if event.is_action_pressed("open_prompt"):
+		if event.is_action_pressed("open_prompt") && singleplayer:
 			toggle_control_visibility($GUI/command_prompt)
 		if event.is_action_pressed("debug_toggle"):
 			toggle_control_visibility($GUI/Debug)
@@ -473,18 +479,18 @@ func world_collision_setup():
 	$"Map Input Events/CollisionShape3D".shape.size = collision_shape
 	$"Map Input Events/MeshInstance3D".mesh.size = collision_shape
 
-var prev_input_pos : Vector2i
-
 func world_input_event(_a, event, _position, _d, _e):
 	var transformed = transform_input_position(_position)
 	if transformed.x >= 0 and transformed.x <= Map.size.x-1 and transformed.y >= 0 and transformed.y <= Map.size.y-1:
 		emit_signal("tile_hover", transformed)
-		if event is InputEventMouseButton && event.is_action_pressed("left_click"):
+		if event is InputEventMouseButton && event.is_action_pressed("left_click") && selected_building == null:
 			if prev_input_pos != null:
 				set_color(prev_input_pos, get_tile_color(prev_input_pos))
 			set_color(Vector2i(transformed.x, transformed.y), "ed2e21")
 			prev_input_pos = Vector2i(transformed.x, transformed.y)
 			emit_signal("tile_selected", transformed)
+		else: if event is InputEventMouseButton && event.is_action_pressed("left_click"):
+			building_placed(transformed, selected_building)
 
 func transform_input_position(pos : Vector3) -> Vector2:
 	
@@ -597,18 +603,31 @@ func open_lobby_prompt():
 
 func on_set_up_finished():
 	print("world setup finished")
-	connect("tile_hover", Callable(self, "inspector_update"))
-	connect("toggle_control", Callable(self, "toggle_control_visibility"))
+	connect("tile_selected", Callable(self, "inspector_update"))
 	$GUI/Minimap/Area2D.connect("collision", minimap_input_event)
 	var country_hud = preload("res://UI/country_hud.tscn").instantiate()
 	country_hud.connect("building_selected", Callable(self, "on_building_selected"))
 	$GUI.add_child(country_hud)
 	$GUI/map_mode.show()
+	Player.connect("map_mode_changed", Callable(self, "on_map_mode_changed"))
 
 func on_building_selected(_building : String):
 	print(_building, " selected")
 	$GUI/map_mode.selected = Player.map_mode_list.construction
 	Player.set_map_mode(Player.map_mode_list.construction)
+	selected_building = _building
+
+func building_placed(pos : Vector2i, _building : String):
+	Map.countries[Player.country_id].add_building_to_queue(pos, _building)
+	selected_building = null
+
+# change how the map looks accordingly
+func on_map_mode_changed(index : int):
+	match index:
+		Player.map_mode_list.construction:
+			pass
+		_:
+			pass
 
 ### Minimap
 

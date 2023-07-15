@@ -20,7 +20,7 @@ func _process(_delta):
 
 func new_button_pressed():
 	var world = preload("res://World/world.tscn").instantiate()
-	world.init(Vector2i(512, 384),"")
+	world.init(Vector2i(512, 384),"", true)
 	get_tree().get_root().add_child(world)
 	get_tree().change_scene_to_packed(world)
 	self.queue_free()
@@ -30,7 +30,7 @@ func return_button_button_pressed():
 
 func open_button_button_pressed():
 	var world = preload("res://World/world.tscn").instantiate()
-	world.init(Vector2i(0,0), "user://"+selected_save)
+	world.init(Vector2i(0,0), "user://"+selected_save, true)
 	get_tree().get_root().add_child(world)
 	get_tree().change_scene_to_packed(world)
 	self.queue_free()
