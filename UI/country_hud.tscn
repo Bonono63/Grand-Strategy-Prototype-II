@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://bfcuvgcw6lh3u"]
 
 [ext_resource type="Script" path="res://UI/country_hud.gd" id="1_3ml0l"]
-[ext_resource type="Script" path="res://UI/Queue Container.gd" id="2_f8y0b"]
+[ext_resource type="Script" path="res://UI/Building Queue.gd" id="2_bsdxh"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_b8twl"]
 size = Vector2(32, 32)
@@ -37,17 +37,14 @@ offset_bottom = 357.0
 rotation = 1.5708
 columns = 3
 
-[node name="ScrollContainer" type="ScrollContainer" parent="TabContainer/Construction"]
-layout_mode = 0
+[node name="Building Queue" type="Control" parent="TabContainer/Construction"]
+anchors_preset = 0
 offset_left = 785.0
 offset_top = 16.0
 offset_right = 1047.0
 offset_bottom = 783.0
 rotation = 1.5708
-
-[node name="Queue Container" type="Container" parent="TabContainer/Construction/ScrollContainer"]
-layout_mode = 2
-script = ExtResource("2_f8y0b")
+script = ExtResource("2_bsdxh")
 
 [node name="Culture" type="Panel" parent="TabContainer"]
 visible = false

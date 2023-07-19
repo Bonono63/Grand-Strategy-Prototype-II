@@ -45,13 +45,13 @@ func set_terrain(x : int, y : int, value : String):
 	else:
 		printerr("terrain arguments where out of range")
 
-func set_building(x : int, y : int, building_type : String, values : Dictionary):
+func set_building(x : int, y : int, building_type : String):
 	if x <= size.x && y <= size.y && building_types.has(building_type):
 		tile_map[x][y].building_type = building_type
 		var pos = (y+(x*Map.size.x))
 		buildings[str(pos)] = building_types[building_type]
-		if !values.is_empty():
-			buildings[str(pos)].values = values
+		#if !values.is_empty():
+		#	buildings[str(pos)].values = values
 		emit_signal("building_map_change", Vector2i(x,y))
 	else:
 		printerr("building arguments where out of range")
@@ -60,6 +60,13 @@ func set_building(x : int, y : int, building_type : String, values : Dictionary)
 func set_territory(x : int, y : int, country_value : String):
 	if x <= size.x && y <= size.y:
 		tile_map[x][y].controller = country_value
+		emit_signal("territory_map_change", Vector2i(x,y))
+	else:
+		printerr("territory arguments where out of range")
+
+func set_population(x : int, y : int, population_name : String, quantity : int):
+	if x <= size.x && y <= size.y:
+		tile_map[x][y].population[population_name] = quantity
 		emit_signal("territory_map_change", Vector2i(x,y))
 	else:
 		printerr("territory arguments where out of range")

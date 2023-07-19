@@ -1,43 +1,96 @@
-[gd_scene load_steps=6 format=3 uid="uid://dwcg4l811gayo"]
+[gd_scene load_steps=14 format=3 uid="uid://dwcg4l811gayo"]
 
 [ext_resource type="Script" path="res://UI/Construction/queued_building.gd" id="1_1hduw"]
+[ext_resource type="Texture2D" uid="uid://devc7w2h45jn3" path="res://UI/Button Resources/delete_button.png" id="2_36y2k"]
+[ext_resource type="Texture2D" uid="uid://chxhcakkj0hyj" path="res://UI/Button Resources/building_button.png" id="2_mltcc"]
+[ext_resource type="Texture2D" uid="uid://ckdu1qylmbdu4" path="res://UI/Button Resources/delete_button_highlighted.png" id="3_pmro3"]
+[ext_resource type="Texture2D" uid="uid://bv8uwiicjakof" path="res://UI/Button Resources/up_arrow.png" id="5_nnfc5"]
+[ext_resource type="Texture2D" uid="uid://bgf5805jdp4qh" path="res://UI/Button Resources/up_arrow_pressed.png" id="6_mpsxu"]
+[ext_resource type="Texture2D" uid="uid://c6clkxrrbu3d7" path="res://UI/Button Resources/up_arrow_highlighted.png" id="7_qeuhb"]
+[ext_resource type="Texture2D" uid="uid://cvgbtowek4535" path="res://UI/Button Resources/up_arrow_disabled.png" id="8_pnxhx"]
+[ext_resource type="Texture2D" uid="uid://c2g7mlrcj6lbb" path="res://UI/Button Resources/down_arrow.png" id="9_7hyaq"]
+[ext_resource type="Texture2D" uid="uid://b405ahquiabsr" path="res://UI/Button Resources/down_arrow_pressed.png" id="10_5tipm"]
+[ext_resource type="Texture2D" uid="uid://ckhybdifovlnc" path="res://UI/Button Resources/down_arrow_highlighted.png" id="11_gtyhv"]
+[ext_resource type="Texture2D" uid="uid://bvluprwtgrqca" path="res://UI/Button Resources/down_arrow_disabled.png" id="12_m02mt"]
+[ext_resource type="Texture2D" uid="uid://ijaeuqtm2l0v" path="res://UI/Button Resources/progress_bar_0.png" id="13_yqg81"]
 
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_r0brv"]
-size = Vector2(32, 32)
-
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_382lb"]
-size = Vector2(32, 32)
-
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_h8ckn"]
-size = Vector2(32, 32)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_6lkq4"]
-size = Vector2(300, 32)
-
-[node name="queued_building" type="PanelContainer"]
-offset_right = 300.0
-offset_bottom = 32.0
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 261.504
+offset_bottom = 31.752
 script = ExtResource("1_1hduw")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 0
+offset_right = 262.0
+offset_bottom = 32.0
 
 [node name="building_name" type="Label" parent="."]
 layout_mode = 2
+offset_left = 101.0
+offset_top = 3.0
+offset_right = 160.0
+offset_bottom = 29.0
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_horizontal = 4
+mouse_filter = 1
 text = "fortnite"
 
 [node name="remove" type="TextureButton" parent="."]
 layout_mode = 2
+offset_left = 230.0
+offset_right = 262.0
+offset_bottom = 32.0
 size_flags_horizontal = 8
-texture_normal = SubResource("PlaceholderTexture2D_r0brv")
-texture_pressed = SubResource("PlaceholderTexture2D_382lb")
+size_flags_vertical = 8
+focus_mode = 0
+texture_normal = ExtResource("2_36y2k")
+texture_pressed = ExtResource("3_pmro3")
 
 [node name="building_image" type="TextureRect" parent="."]
 layout_mode = 2
+offset_right = 32.0
+offset_bottom = 32.0
 size_flags_horizontal = 0
 size_flags_vertical = 0
-texture = SubResource("PlaceholderTexture2D_h8ckn")
+texture = ExtResource("2_mltcc")
 
-[node name="Area2D" type="Area2D" parent="."]
+[node name="Up" type="TextureButton" parent="."]
+layout_mode = 2
+offset_left = 34.0
+offset_right = 50.0
+offset_bottom = 16.0
+focus_mode = 0
+texture_normal = ExtResource("5_nnfc5")
+texture_pressed = ExtResource("6_mpsxu")
+texture_hover = ExtResource("7_qeuhb")
+texture_disabled = ExtResource("8_pnxhx")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
-position = Vector2(150, 16)
-shape = SubResource("RectangleShape2D_6lkq4")
+[node name="Down" type="TextureButton" parent="."]
+layout_mode = 2
+offset_left = 34.0
+offset_top = 16.0
+offset_right = 50.0
+offset_bottom = 32.0
+focus_mode = 0
+texture_normal = ExtResource("9_7hyaq")
+texture_pressed = ExtResource("10_5tipm")
+texture_hover = ExtResource("11_gtyhv")
+texture_disabled = ExtResource("12_m02mt")
+
+[node name="progress" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -78.752
+offset_top = -7.876
+offset_right = -46.752
+offset_bottom = 8.124
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("13_yqg81")

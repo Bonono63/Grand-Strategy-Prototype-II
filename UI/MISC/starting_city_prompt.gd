@@ -39,6 +39,7 @@ func confirmed():
 		Queue.add_command(Queue.types.set_territory, {"x":selected_tile.x, "y":selected_tile.y+1, "controller_id":Player.country_id})
 		Queue.add_command(Queue.types.set_territory, {"x":selected_tile.x-1, "y":selected_tile.y-1, "controller_id":Player.country_id})
 		Queue.add_command(Queue.types.set_territory, {"x":selected_tile.x, "y":selected_tile.y-1, "controller_id":Player.country_id})
-	Queue.add_command(Queue.types.set_building, { "x" : selected_tile.x, "y" : selected_tile.y, "building_type" : "city_center", "values": {"pop":{Map.countries[Player.country_id].native_pop:3}}})
+	Queue.add_command(Queue.types.set_building, { "x" : selected_tile.x, "y" : selected_tile.y, "building_type" : "city_center"})
+	Queue.add_command(Queue.types.set_population, { "x" : selected_tile.x, "y" : selected_tile.y, "population_name" : "native", "quantity" : 3})
 	get_parent().get_parent().emit_signal("setup_finished")
 	self.queue_free()

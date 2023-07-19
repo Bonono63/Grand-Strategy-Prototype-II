@@ -572,25 +572,28 @@ func inspector_update(_position : Vector2i):
 	var x = _position.x
 	var y = _position.y
 	
+	var _tile = Map.tile_map[x][y]
+	
 	inspector.show()
 	
 	coords.text = str("Coordinates: ", x, ", ", y)
 	
 	var controller : String
 	
-	if Map.tile_map[x][y].controller != "":
-		controller = Map.tile_map[x][y].controller
+	if _tile.controller != "":
+		controller = _tile.controller
 	else:
 		controller = "None"
 	
 	var building_details = ""
 	
-	if !Map.tile_map[x][y].building_type.is_empty():
+	if !_tile.building_type.is_empty():
 		building_details = str("\nBuilding Details: ", Map.buildings[str(y+(x*Map.size.x))].values)
 	
-	info.text = str("Terrain: ", Map.tile_map[x][y].terrain_type,
-	"\nBuilding: ", Map.tile_map[x][y].building_type,
+	info.text = str("Terrain: ", _tile.terrain_type,
+	"\nBuilding: ", _tile.building_type,
 	building_details,
+	"\npopulation: ", _tile.population,
 	"\nController: ", controller)
 
 func pick_starting_city_prompt():

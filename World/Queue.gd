@@ -4,7 +4,7 @@ extends Node
 
 var commands : Array
 
-enum types { create_country, create_culture, sync_country_data, set_territory, set_building, set_terrain, division_movement }
+enum types { create_country, create_culture, sync_country_data, set_territory, set_building, set_terrain, set_population, division_movement }
 
 func _process(_delta):
 	for c in commands:
@@ -15,11 +15,13 @@ func _process(_delta):
 			types.create_culture:
 				Map.create_culture(c.arguments["gender_ratio"], c.arguments["life_span"], c.arguments["display_name"])
 			types.set_building:
-				Map.set_building(c.arguments["x"], c.arguments["y"], c.arguments["building_type"], c.arguments["values"])
+				Map.set_building(c.arguments["x"], c.arguments["y"], c.arguments["building_type"])
 			types.set_territory:
 				Map.set_territory(c.arguments["x"], c.arguments["y"], c.arguments["controller_id"])
 			types.set_terrain:
 				Map.set_terrain(c.arguments["x"], c.arguments["y"], c.arguments["terrain_type"])
+			types.set_population:
+				Map.set_population(c.arguments["x"], c.arguments["y"], c.arguments["population_name"], c.arguments["quantity"])
 		commands.erase(c)
 
 func add_command(type : int, arguments : Dictionary):

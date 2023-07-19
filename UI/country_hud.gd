@@ -3,7 +3,7 @@ extends Control
 signal building_selected
 
 @onready var building_list = $TabContainer/Construction/Building_selection
-@onready var building_queue = $TabContainer/Construction/ScrollContainer/Building_Queue
+@onready var building_queue = $"TabContainer/Construction/Building Queue"
 
 func add_building_to_construction_tab(_building : String):
 	var building_button = preload("res://UI/Construction/building_selection_button.tscn").instantiate()
@@ -27,12 +27,17 @@ func update_building_queue():
 	for child in building_queue.get_children():
 		child.queue_free()
 	
-	for _building in Map.countries[Player.country_id].building_queue:
+	var index = 0
+	var offset = 0
+	while (index < Map.countries[Player.country_id].building_queue.size()):
+		var _building = Map.countries[Player.country_id].building_queue[index]
 		var item = preload("res://UI/Construction/queued_building.tscn").instantiate()
-		item.init(_building._building)
+		
+		item.init(_building._building, index, )
+		item.position = Vector2(0,(32*index)+(offset*index))
 		building_queue.add_child(item)
 		
-		print("fortnite")
+		index+=1
 
 func on_tabs_toggled():
 	if $TabContainer.visible:
