@@ -105,7 +105,7 @@ func load_map_resources(path : String):
 		terrain_dir.list_dir_begin()
 		var file_name = terrain_dir.get_next()
 		
-		while file_name != "":
+		while !file_name.is_empty():
 			if file_name.ends_with(".json"):
 				load_terrain_file(terrain_dir.get_current_dir(), file_name)
 			
@@ -136,6 +136,7 @@ func load_map_resources(path : String):
 	emit_signal("resources_loaded")
 
 func load_terrain_file(path : String, file_name : String) -> void:
+	
 	var data : Dictionary = get_json_data(path, file_name)
 	var _terrain = terrain.new()
 	
@@ -170,7 +171,7 @@ func load_resource_file(path : String, file_name : String) -> void:
 
 func get_json_data(path: String, file_name : String) -> Dictionary:
 	var data : Dictionary = {}
-	var location = path+file_name
+	var location = path+"/"+file_name
 	
 	var file := FileAccess.open(location, FileAccess.READ)
 	var error := FileAccess.get_open_error()

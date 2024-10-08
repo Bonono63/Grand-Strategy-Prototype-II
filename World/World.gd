@@ -4,6 +4,7 @@ extends Node3D
 ### Essentially the main loop of the game
 
 @onready var minimap = $GUI/Minimap
+
 @onready var camera = $Camera
 @onready var inspector = $"GUI/location Inspector"
 
@@ -449,6 +450,7 @@ func get_color(coordinates : Vector2i) -> Color:
 func get_tile_color(pos : Vector2i) -> Color:
 	var color : Color
 	var terrain_type = Map.tile_map[pos.x][pos.y].terrain_type
+	
 	if terrain_type != null:
 		color = Color(Map.terrain_types[terrain_type].color)
 	else:
